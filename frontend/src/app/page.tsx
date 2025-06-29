@@ -1,103 +1,116 @@
 import Image from "next/image";
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div data-layer="Sign in/up-for professionals" className="SignInUpForProfessionals w-full h-screen bg-white inline-flex justify-center items-start overflow-hidden">
+    <div data-layer="Form Container" className="FormContainer max-w-screen-md flex-1 self-stretch px-10 pb-2 inline-flex flex-col justify-center items-center overflow-hidden">
+        <div data-layer="Form" className="Form self-stretch flex-1 pt-14 flex flex-col justify-center items-center gap-12">
+            <div data-layer="Header Container" className="HeaderContainer self-stretch flex flex-col justify-start items-start gap-1">
+                <div data-layer="Subtitle" className="Subtitle self-stretch text-center justify-start text-Labels-Primary text-3xl font-semibold font-['Inter_Tight'] leading-[48px] tracking-tight">AURA for professionals</div>
+                <div data-layer="Form Description" className="FormDescription self-stretch text-center justify-start text-Labels-Secondary/60 text-base font-medium font-['Inter_Tight']">Create an account or log in to manage your business.</div>
+            </div>
+            <div data-layer="Form Fields Container" className="FormFieldsContainer self-stretch flex flex-col justify-start items-start gap-6">
+                <div data-layer="Email Input Container" className="EmailInputContainer self-stretch px-20 flex flex-col justify-start items-center gap-4">
+                    <Input 
+                        type="email" 
+                        placeholder="Enter your email" 
+                        className="self-stretch min-h-11 px-3 py-2 bg-black/5 rounded-lg border-0  font-normal font-['Inter_Tight'] leading-snug tracking-wide text-black" 
+                    />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+                    <Button className="SubmitButton self-stretch h-11 px-5 py-2 rounded-lg inline-flex justify-center items-center gap-2 text-base font-medium font-['Inter_Tight']">Continue</Button>
+                </div>
+                <div data-layer="Divider Container" className="DividerContainer self-stretch px-20 inline-flex justify-center items-center gap-2">
+                    <div data-layer="Divider Left" className="DividerLeft flex-1 h-px relative bg-gray-200" />
+                    <div data-layer="Form Description" className="FormDescription text-center justify-start text-Labels-Secondary/60 text-base font-medium font-['Inter_Tight']">or</div>
+                    <div data-layer="Divider Right" className="DividerRight flex-1 h-px relative bg-gray-200" />
+                </div>
+                <div data-layer="Social Buttons Container" className="SocialButtonsContainer self-stretch px-20 flex flex-col justify-start items-center gap-4">
+                    
+                    <Button variant="outline" className="SocialButtonsContainer self-stretch px-20  justify-center items-center gap-4 h-11">
+                    <Image
+                        src="/icons/google.svg" 
+                        width={24}
+                        height={24}
+                        alt="google logo"
+                        priority
+                    />
+                        <div data-layer="See All Button Text" className="SeeAllButtonText justify-center text-black/90 text-base font-medium font-['Inter_Tight']">Continue with Google</div>
+                        
+                    </Button>
+                    <Button variant="outline" className="SocialButtonsContainer self-stretch px-20  justify-center items-center gap-4 h-11">
+                    <Image
+                        src="/icons/apple.svg" 
+                        width={24}
+                        height={24}
+                        alt="apple logo"
+                        priority
+                    />
+                        <div data-layer="See All Button Text" className="SeeAllButtonText justify-center text-black/90 text-base font-medium font-['Inter_Tight']">Continue with Apple</div>
+                        
+                    </Button>
+                    <Button variant="outline" className="SocialButtonsContainer self-stretch px-20  justify-center items-center gap-4 h-11">
+                    <Image
+                        src="/icons/facebook.svg" 
+                        width={24}
+                        height={24}
+                        alt="facebook logo"
+                        priority
+                    />
+                        <div data-layer="See All Button Text" className="SeeAllButtonText justify-center text-black/90 text-base font-medium font-['Inter_Tight']">Continue with Facebook</div>
+                        
+                    </Button>
+                    
+                </div>
+            </div>
+            <div data-layer="Footer Container" className="FooterContainer self-stretch flex flex-col justify-center items-center">
+                <div data-layer="Form Description" className="FormDescription self-stretch text-center justify-start text-black/90 text-base font-medium font-['Inter_Tight']">Are you a customer looking to book an appointment?</div>
+                <Button variant="link">
+                <div data-layer="Language Text" className="LanguageText text-center justify-start text-blue-600 text-base font-normal font-['Inter_Tight']">Go to AURA for customers</div>
+                </Button>
+            </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div data-layer="Language Selector" className="LanguageSelector py-2 inline-flex justify-start items-center gap-4">
+            <Button variant="link">
+            <Image
+                        src="/icons/globe.svg" 
+                        width={20}
+                        height={20}
+                        alt=""
+                        priority
+                    />
+                <div data-layer="Language Text" className="LanguageText text-center justify-start text-blue-600 text-sm font-normal font-['Inter_Tight']">English</div>
+            </Button>
+
+            <Button variant="link">
+            <Image
+                        src="/icons/tube.svg" 
+                        width={20}
+                        height={20}
+                        alt=""
+                        priority
+                    />
+                <div data-layer="Language Text" className="LanguageText text-center justify-start text-blue-600 text-sm font-normal font-['Inter_Tight']">Help and support</div>
+            </Button>
+        </div>
     </div>
+    <div data-layer="Logo Container" className="LogoContainer w-[690px] self-stretch bg-gradient-to-b from-rose-100 to-white inline-flex flex-col justify-end items-center gap-2 overflow-hidden">
+        <div data-layer="Logo Background Container" className="LogoBackgroundContainer self-stretch flex-1 p-28 relative flex flex-col justify-center items-center gap-2">
+            <div data-layer="Logo Text" data-property-1="Default" className="LogoText self-stretch h-32 relative flex items-center justify-center">
+              <Image
+                src="/images/logoText.png" 
+                width={500}
+                height={128}
+                alt="Aura logo"
+                priority
+              />
+            </div>
+            <div data-layer="Ellipse 2100" className="Ellipse2100 w-96 h-96 left-[-185px] top-[-234px] absolute bg-orange-600/70 rounded-full blur-[200px]" />
+            <div data-layer="Ellipse 2101" className="Ellipse2101 w-[471px] h-[471px] left-[468px] top-[828px] absolute bg-yellow-400 rounded-full blur-[200px]" />
+        </div>
+    </div>
+</div>
   );
 }
