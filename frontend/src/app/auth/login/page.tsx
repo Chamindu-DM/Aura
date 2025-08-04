@@ -21,7 +21,7 @@ export default function Login() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Redirect to onboarding
-      router.push('/welcome');
+      router.push('/onboarding/welcome');
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
