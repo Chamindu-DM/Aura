@@ -17,5 +17,9 @@
   ],
   "emmet.includeLanguages": {
     "postcss": "css"
-  }
+  },
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.suggest.autoImports": true,
+  "typescript.preferences.useAliasesForRenames": false,
+  "typescript.updateImportsOnFileMove.enabled": "always"
 }
