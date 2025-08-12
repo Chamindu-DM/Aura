@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter_Tight } from 'next/font/google'
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const interTight = Inter_Tight({
   variable: "--font-inter-tight",
@@ -34,6 +35,7 @@ export default function RootLayout({
         className={`${interTight.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );
