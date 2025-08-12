@@ -25,6 +25,7 @@ export default function BusinessInfo() {
 
         // Store data in localStorage
         localStorage.setItem('salon-name', salonName);
+        localStorage.setItem('salon-location', salonLocation);
 
         toast.success("Salon profile created!");
         router.push('/setup-services');
@@ -86,22 +87,19 @@ export default function BusinessInfo() {
 
                 <div data-layer="Input Field" className="InputField self-stretch flex flex-col justify-start items-start gap-2">
                         <Label
-                            htmlFor="salon-name"
+                            htmlFor="salon-location"
                             className="text-black text-base font-medium font-['Inter_Tight'] leading-snug"
                         >
-                            Salon name
+                            Salon location
                         </Label>
                         <Input 
-                            id="salon-name"
+                            id="salon-location"
                             type="text"
-                            value={salonName}
-                            onChange={(e) => setSalonName(e.target.value)}
-                            placeholder="Enter your salon name"
+                            value={salonLocation}
+                            onChange={(e) => setSalonLocation(e.target.value)}
+                            placeholder="Enter your salon address"
                             className="min-h-11 px-3 py-2 bg-black/5 border-black/10 text-black text-base font-normal font-['Inter_Tight'] leading-snug tracking-wide"
                         />
-                        <div data-layer="Validation message" className="ValidationMessage self-stretch justify-end text-gray-500 text-xs font-normal font-['Inter']">
-                            This name will appear to clients and collaborators.
-                        </div>
                     </div>
 
                 {/* Button Container */}
