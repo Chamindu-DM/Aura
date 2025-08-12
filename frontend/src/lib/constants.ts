@@ -1,19 +1,19 @@
 // App constants placeholder
 export const ROUTES = {
   HOME: '/',
-  LOGIN: '/login',
-  SIGNUP: '/signup',
-  WELCOME: '/welcome',
-  BUSINESS_INFO: '/business-info',
-  SETUP_SERVICES: '/setup-services',
-  SCHEDULE: '/schedule',
-  SETUP_TEAM: '/setup-team',
-  DASHBOARD: '/dashboard',
-  APPOINTMENTS: '/appointments',
-  CLIENTS: '/clients',
-  SERVICES: '/services',
-  TEAM: '/team',
-  SETTINGS: '/settings',
+  LOGIN: '/auth/login',
+  SIGNUP: '/auth/signup',
+  WELCOME: '/onboarding/welcome',
+  BUSINESS_INFO: '/onboarding/business-info',
+  SETUP_SERVICES: '/onboarding/setup-services',
+  SCHEDULE: '/onboarding/schedule',
+  SETUP_TEAM: '/onboarding/setup-team',
+  DASHBOARD: '/dashboard/dashboard',
+  APPOINTMENTS: '/dashboard/appointments',
+  CLIENTS: '/dashboard/clients',
+  SERVICES: '/dashboard/services',
+  TEAM: '/dashboard/team',
+  SETTINGS: '/dashboard/settings',
 } as const;
 
 export const API_ENDPOINTS = {
