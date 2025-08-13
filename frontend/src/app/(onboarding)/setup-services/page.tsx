@@ -12,20 +12,20 @@ function LabeledInput({
   value,
   onChange,
   placeholder,
-}: {
+}: Readonly<{
   label: string;
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
-}) {
+}>) {
   return (
     <div className="w-full max-w-[512px] inline-flex flex-col gap-1">
-      <div className="text-black text-base font-medium leading-snug">{label}</div>
+      <div className="text-black text-base font-medium font-['Inter_Tight'] leading-snug">{label}</div>
       <Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="px-3 py-2 bg-neutral-600/10 rounded-lg text-black text-base leading-tight"
+        className="px-3 py-2 bg-neutral-600/10 rounded-lg text-black text-base leading-tight font-['Inter_Tight']"
       />
     </div>
   );
@@ -92,10 +92,17 @@ export default function SetupServices() {
     <div className="py-10 bg-white flex flex-col items-center gap-10 min-h-screen">
       <div className="self-stretch py-10 border-b border-black/10 flex flex-col items-center gap-2">
         <div className="w-full max-w-[800px] flex flex-col items-center gap-2">
-          <div className="text-gray-500 text-base font-medium leading-snug">Account setup</div>
-          <div className="text-black text-4xl font-bold leading-[48px] tracking-tight">Set up your services</div>
-          <div className="text-gray-500 text-base font-medium">Create and customize the services you offer.</div>
+          <div className="text-gray-500 text-base font-medium leading-snug font-['Inter_tight']">Account setup</div>
+          <div className="text-black text-4xl font-bold leading-[48px] font-['Inter_Tight'] tracking-tight">Set up your services</div>
+          <div className="text-gray-500 text-base font-medium font-['Inter_Tight']">Create and customize the services you offer.</div>
         </div>
+        <div data-layer="Progress Bar Container" className="ProgressBarContainer w-full max-w-[512px] px-10 py-4 inline-flex justify-start items-start gap-2">
+                
+                <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-1 bg-black rounded-lg" />
+                <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-1 bg-black rounded-lg" />
+                <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-1 bg-black rounded-lg" />
+            
+            </div>
       </div>
 
       <div className="w-full max-w-[720px] p-6 bg-white rounded-2xl flex flex-col items-center gap-6">
@@ -103,7 +110,7 @@ export default function SetupServices() {
         <Input
           value={serviceName}
           onChange={(e) => setServiceName(e.target.value)}
-          className="w-full max-w-[512px] text-black text-3xl font-bold bg-transparent px-3 py-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="w-full max-w-[512px] text-black text-3xl font-bold font-['Inter_Tight'] bg-transparent px-3 py-0 focus-visible:ring-0 focus-visible:ring-offset-0"
           placeholder="Enter service name"
         />
 
@@ -117,14 +124,14 @@ export default function SetupServices() {
 
         {/* Toggle for multiple options */}
         <div className="w-full max-w-[512px] inline-flex items-center gap-4">
-          <div className="text-black/90 text-xs font-medium tracking-tight">Enable Multiple Options</div>
+          <div className="text-black/90 text-xs font-['Inter_Tight'] font-medium tracking-tight">Enable Multiple Options</div>
           <Switch checked={multipleOptions} onCheckedChange={setMultipleOptions} />
         </div>
 
         {/* Options list (show one when toggle is OFF, all when ON) */}
         {(multipleOptions ? options : options.slice(0, 1)).map((opt, idx) => (
           <div key={opt.id} className="w-full max-w-[512px] rounded-xl border border-black/10 p-4 space-y-4">
-            <div className="text-sm font-medium text-black/70">
+            <div className="text-sm font-medium font-['Inter_Tight'] text-black/70">
               {multipleOptions ? `Option ${idx + 1}` : 'Option'}
             </div>
 
@@ -174,7 +181,7 @@ export default function SetupServices() {
         {/* Add Option button only when multiple options is ON */}
         {multipleOptions && (
           <div className="w-full max-w-[512px]">
-            <Button variant="outline" className="px-5" onClick={addOption}>
+            <Button variant="outline" className="px-5 font-['Inter_Tight']" onClick={addOption}>
               Add Option
             </Button>
           </div>
@@ -182,10 +189,10 @@ export default function SetupServices() {
 
         {/* Actions */}
         <div className="w-full max-w-[512px] py-2 flex justify-end gap-3">
-          <Button variant="secondary" onClick={handleDelete}>
+          <Button variant="secondary" onClick={handleDelete} className='font-["Inter_Tight"]'>
             Delete
           </Button>
-          <Button onClick={handleSave} className="bg-black text-white hover:bg-black/90">
+          <Button onClick={handleSave} className="bg-black text-white font-['Inter_Tight'] hover:bg-black/90">
             Save
           </Button>
         </div>

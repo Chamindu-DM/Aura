@@ -76,7 +76,6 @@ export default function Welcome() {
                 <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-1 bg-black rounded-lg" />
                 <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-1 bg-gray-200 rounded-lg" />
                 <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-1 bg-gray-200 rounded-lg" />
-                <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-1 bg-gray-200 rounded-lg" />
             
             </div>
         </div>

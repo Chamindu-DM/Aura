@@ -39,11 +39,12 @@ export default function BusinessInfo() {
                     <div data-layer="Subtitle" className="Subtitle self-stretch text-center justify-start text-black text-4xl font-bold font-['Inter_Tight'] leading-[48px] tracking-tight">Let's set up your salon profile</div>
                     <div data-layer="Form Description" className="FormDescription self-stretch text-center justify-start text-gray-500 text-base font-medium font-['Inter_Tight']">This will be the home for all your services and bookings.</div>
                     <div data-layer="Progress Bar Container" className="ProgressBarContainer w-full max-w-[512px] px-10 py-4 inline-flex justify-start items-start gap-2">
-                        <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-0.5 bg-black rounded-lg" />
-                        <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-0.5 bg-black rounded-lg" />
-                        <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-0.5 bg-gray-200 rounded-lg" />
-                        <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-0.5 bg-gray-200 rounded-lg" />
-                    </div>
+                
+                <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-1 bg-black rounded-lg" />
+                <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-1 bg-black rounded-lg" />
+                <div data-layer="Progress Bar Segment" className="ProgressBarSegment flex-1 h-1 bg-gray-200 rounded-lg" />
+            
+            </div>
                 </div>
             </div>
 
