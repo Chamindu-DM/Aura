@@ -1,4 +1,6 @@
-import 
+import SidebarButton from '@/components/dashboard/sidebarButton';
+import Sidebar from '@/components/dashboard/sidebar';
+
 export default function DashboardLayout({
   children,
 }: {
@@ -6,19 +8,13 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="flex">
-        {/* Sidebar placeholder */}
-        <div className="w-64 bg-white shadow-sm">
-          <div className="p-4">
-            <h2 className="text-lg font-semibold">Dashboard Navigation</h2>
-          </div>
-        </div>
+      <div data-layer="Container" className="Container pl-[80px] w-full self-stretch inline-flex justify-start items-start overflow-hidden">
+        {/* Sidebar*/}
+        <Sidebar/>
         
         {/* Main content */}
-        <div className="flex-1">
-          <div className="container mx-auto px-4 py-8">
+        <div data-layer="Main Container" className="MainContainer w-full self-stretch p-4 bg-gray-100">
             {children}
-          </div>
         </div>
       </div>
     </div>
