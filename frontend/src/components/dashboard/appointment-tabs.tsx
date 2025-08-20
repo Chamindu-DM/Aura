@@ -24,7 +24,7 @@ export function AppointmentTabs({ tabs, onTabChange }: AppointmentTabsProps) {
   }
 
   return (
-    <div className="border-b border-[rgba(92,92,92,0.2)] pb-0">
+    <div className="border-b border-[rgba(92,92,92,0.2)] pb-1">
       <div className="flex gap-10 items-center">
         {tabs.map((tab, index) => (
           <Button
@@ -32,7 +32,7 @@ export function AppointmentTabs({ tabs, onTabChange }: AppointmentTabsProps) {
             variant="ghost"
             className={`flex gap-4 items-center px-2 py-4 relative ${
               activeTab === index 
-                ? 'border-b border-black text-black' 
+                ? 'text-black' 
                 : 'text-[rgba(33,33,33,0.62)]'
             }`}
             onClick={() => handleTabClick(index)}

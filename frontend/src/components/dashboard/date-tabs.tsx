@@ -33,7 +33,7 @@ export function DateTabs({ dates, activeDate = 0, onDateChange }: DateTabsProps)
           <Button
             key={index}
             variant="ghost"
-            className={`p-0 h-auto font-['Inter_Tight'] font-bold text-[40px] leading-[48px] tracking-[0.4px] ${
+            className={`p-0 h-auto font-['Inter_Tight'] font-bold text-[28px] leading-[28px] tracking-[0.4px] ${
               currentDate === index 
                 ? 'text-[#212121]' 
                 : 'text-[rgba(33,33,33,0.4)]'

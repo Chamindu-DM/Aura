@@ -27,7 +27,7 @@ export function AppointmentCard({
       <div className="flex gap-10 items-center pl-0 pr-4 py-0">
         {/* Time Section */}
         <div className="flex-1 flex items-center gap-2">
-          <div className="bg-[rgba(255,255,255,0.5)] flex flex-col gap-3 h-full items-start justify-center p-4">
+          <div className="flex flex-col gap-3 h-full items-start justify-center p-4">
             <div className="flex gap-2 items-center">
               <Clock className="h-4 w-4" />
               <div className="font-['Inter_Tight'] font-medium text-black text-[15px] leading-[22px]">

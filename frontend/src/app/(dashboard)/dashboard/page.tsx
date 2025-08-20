@@ -4,16 +4,17 @@ import { Button } from '@/components/ui/button'
 import { ChevronDown, MoreHorizontal } from 'lucide-react'
 import { StatsCard } from '@/components/dashboard/stats-card'
 import { AppointmentCard } from '@/components/dashboard/appointment-card'
-import { AppointmentTabs } from '@/components/dashboard/appointment-tabs'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
 import { DateTabs } from '@/components/dashboard/date-tabs'
 import { ViewCalendarButton } from '@/components/dashboard/view-calendar-button'
 import { ProfileStack } from '@/components/dashboard/profile-stack'
 
 export default function Dashboard() {
   const appointmentTabs = [
-    { label: 'Upcoming', count: 13, active: true },
-    { label: 'Pending', count: 6 },
-    { label: 'Completed', count: 0 }
+    { value: 'upcoming', label: 'Upcoming', count: 13 },
+    { value: 'pending', label: 'Pending', count: 6 },
+    { value: 'completed', label: 'Completed', count: 0 }
   ]
 
   const dates = ['Jan 4', 'Jan 5', 'Jan 6', 'Jan 7', 'Jan 8', 'Jan 9']
@@ -74,7 +75,7 @@ export default function Dashboard() {
   ]
 
   return (
-    <main className="flex flex-col isolate items-start justify-start pb-10 pt-0 px-10 size-full">
+    <main className="bg-white rounded-lg flex flex-col isolate items-start justify-start pb-10 pt-0 px-10 size-full">
       {/* Dashboard Title */}
       <div className="flex flex-col gap-7 items-start justify-start overflow-hidden px-0 py-7 w-full z-[2]">
         <div className="flex items-center justify-between w-full">
@@ -84,11 +85,10 @@ export default function Dashboard() {
               <h1 className="font-['Inter_Tight'] font-bold text-black text-[34px] leading-normal">
                 Dashboard
               </h1>
-              <ChevronDown className="h-6 w-6" />
             </div>
             <div className="bg-[rgba(82,82,82,0.09)] flex gap-2 items-center px-2 py-1 rounded-[10px]">
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-              <span className="font-['Public_Sans'] font-medium text-black text-[15px] leading-[20px]">
+              <span className="font-['Inter_Tight'] font-medium text-black text-[15px] leading-[20px]">
                 Active
               </span>
             </div>
@@ -131,7 +131,26 @@ export default function Dashboard() {
         {/* Appointment Tabs */}
         <div className="flex items-center justify-start w-full z-[3]">
           <div className="flex-1">
-            <AppointmentTabs tabs={appointmentTabs} />
+            <Tabs defaultValue="upcoming" className="w-full">
+              <TabsList>
+                {appointmentTabs.map((tab) => (
+                  <TabsTrigger 
+                    key={tab.value}
+                    value={tab.value}
+                    className="data-[state=active]:bg-white data-[state=active]:text-black"
+                  >
+                    <span className="font-['Inter_Tight'] font-medium text-[15px] leading-[22px]">
+                      {tab.label}
+                    </span>
+                    <Badge className="bg-black text-white rounded-lg px-2">
+                      <span className="font-['Inter'] font-semibold text-[12px] leading-normal tracking-[-0.048px]">
+                        {tab.count}
+                      </span>
+                    </Badge>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
           </div>
           <ViewCalendarButton />
         </div>

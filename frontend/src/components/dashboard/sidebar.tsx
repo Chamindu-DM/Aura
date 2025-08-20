@@ -1,64 +1,237 @@
 'use client'
 import Image from 'next/image';
-import React from "react";
-import {House, Storefront, Gear, UsersThree, Clock} from "@phosphor-icons/react";
-import SidebarButton from "./sidebarButton";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import React, { useState } from "react";
+import { 
+  House, 
+  Storefront, 
+  Gear, 
+  UsersThree, 
+  Clock, 
+  CaretRight 
+} from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
 
-export default function Sidebar() {
-  return (
-    <div data-layer="Sidebar" data-expand="off" className="Sidebar fixed left-0 top-0 p-5 h-screen bg-white shadow-[1px_0px_4px_0px_rgba(0,0,0,0.05)] inline-flex flex-col justify-between items-center">
-    <div data-layer="Sidebar items" className="SidebarItems flex flex-col justify-start items-center gap-3">
-        <div data-layer="Logo Text" data-property-1="Variant2" className="LogoText w-8 h-8 relative rounded-md overflow-hidden">
-              <Image
-                src = "/icons/Logo Text.svg"
-                alt="Info icon"
-                width={40}
-                height={40}                
+interface SidebarProps {
+  onToggle?: (expanded: boolean) => void;
+}
+
+export default function Sidebar({ onToggle }: SidebarProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const pathname = usePathname();
+
+  const handleToggle = () => {
+    const newState = !isExpanded;
+    setIsExpanded(newState);
+    onToggle?.(newState);
+  };
+
+  const menuItems = [
+    { 
+      icon: House, 
+      label: 'Dashboard', 
+      key: 'dashboard',
+      href: '/dashboard'
+    },
+    { 
+      icon: Storefront, 
+      label: 'Services', 
+      key: 'services',
+      href: '/services'
+    },
+    { 
+      icon: Clock, 
+      label: 'Appointments', 
+      key: 'appointments',
+      href: '/appointments'
+    },
+    { 
+      icon: UsersThree, 
+      label: 'Team', 
+      key: 'team',
+      href: '/team'
+    },
+    { 
+      icon: Gear, 
+      label: 'Settings', 
+      key: 'settings',
+      href: '/settings'
+    },
+  ];
+
+  if (isExpanded) {
+    return (
+      <div 
+        className="bg-white fixed left-0 top-0 h-screen w-[256px] flex flex-col justify-between p-5 border-r border-black/10"
+        data-layer="Sidebar" 
+        data-expand="on"
+      >
+        {/* Header */}
+        <div className="flex flex-col gap-5 w-full">
+          <div className="flex items-start justify-between w-full">
+            <div className="flex gap-2 items-start">
+              <div className="h-6 w-[86px]">
+                <Image
+                  src="/images/Logo.svg"
+                  alt="Aura Logo"
+                  width={86}
+                  height={24}
+                  className="object-contain"
                 />
+              </div>
+            </div>
+            <div className="flex gap-2 items-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 p-0 bg-white border-black/5 "
+                onClick={handleToggle}
+              >
+                <Image
+                  src="/icons/Dock Icon.svg"
+                  alt="Collapse sidebar"
+                  width={12}
+                  height={12}
+                  className='!w-5 !h-5 text-gray-400'
+                />
+              </Button>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex flex-col gap-10 w-full">
+            <div className="flex flex-col gap-2 w-full">
+              {/* Navigation Header */}
+              <div className="flex items-center w-full">
+                <span className="font-['Inter'] text-[12px] text-black/50 tracking-[-0.12px]">
+                  Navigation Menu
+                </span>
+                <div className="flex-1 flex items-center py-1">
+                  <div className="h-px w-full bg-black/10" />
+                </div>
+              </div>
+
+              {/* Navigation Items */}
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href;
+                
+                return (
+                  <Link key={item.key} href={item.href} className="w-full">
+                    <Button
+                      variant="ghost"
+                      className={`w-full max-w-[280px] justify-start gap-2 px-3 py-2 h-auto rounded-lg ${
+                        isActive 
+                          ? 'bg-black text-white hover:bg-black/90' 
+                          : 'text-[rgba(60,60,67,0.6)] hover:bg-gray-50'
+                      }`}
+                    >
+                      <Icon size={24} weight={isActive ? 'fill' : 'regular'} />
+                      <span className="font-['Inter_Tight'] font-medium text-[15px] leading-[22px]">
+                        {item.label}
+                      </span>
+                    </Button>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
-        <div data-layer="Sidebar buttons" className="SidebarButtons self-stretch py-2 flex flex-col justify-start items-center gap-2 ">
-            <div data-layer="Separator" className="Separator self-stretch h-2 relative">
-                <div data-layer="Separator" className="Separator h-px left-[9px] top-[4px] w-full bg-black/10" />
+        {/* Profile Settings */}
+        <div className="flex flex-col gap-2 w-full">
+          <div className="flex flex-col gap-2 items-center py-1 w-full">
+            <div className="h-px w-full bg-black/10" />
+          </div>
+          <div className="flex h-10 items-center justify-between w-full">
+            <div className="flex gap-2 items-center">
+              <div 
+                className="w-10 h-10 rounded-lg border border-black/10 bg-cover bg-center"
+                style={{ backgroundImage: 'url(https://placehold.co/40x40)' }}
+              />
+              <div className="flex flex-col">
+                <span className="font-['Inter_Tight'] font-semibold text-[15px] leading-[20px] text-black/50">
+                  Josh Smith
+                </span>
+              </div>
             </div>
-            {/*Import sidebar button*/}
-            <SidebarButton 
-              icon={<House className="!w-5 !h-5 text-gray-400" />}
-              label='Home'
-            />
-            <SidebarButton
-              icon={<Storefront className="!w-5 !h-5 text-gray-400" />}
-              label='Manage Services'
-            />
-            <SidebarButton
-              icon={<Clock className="!w-5 !h-5 text-gray-400" />}
-              label='Business Hours'
-            />
-            <SidebarButton
-              icon={<UsersThree className="!w-5 !h-5 text-gray-400" />}
-              label='Manage Team'
-            />
-            <SidebarButton
-              icon={<Gear className="!w-5 !h-5 text-gray-400" />}
-              label='Settings'
-            />
+            <CaretRight size={24} className="text-black/50" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className="Sidebar fixed left-0 top-0 p-5 h-screen bg-white shadow-[1px_0px_4px_0px_rgba(0,0,0,0.05)] inline-flex flex-col justify-between items-center w-20"
+      data-layer="Sidebar" 
+      data-expand="off"
+    >
+      <div className="SidebarItems flex flex-col justify-start items-center gap-3">
+        <div className="LogoText w-8 h-8 relative rounded-md overflow-hidden">
+          <Image
+            src="/icons/Logo Text.svg"
+            alt="Aura Logo"
+            width={32}
+            height={32}
+          />
+        </div>
+
+        <div className="SidebarButtons self-stretch py-2 flex flex-col justify-start items-center gap-2">
+          <div className="Separator self-stretch h-2 relative">
+            <div className="Separator h-px left-[9px] top-[4px] w-full bg-black/10" />
+          </div>
+          
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
             
+            return (
+              <Link key={item.key} href={item.href}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`w-10 h-10 p-0 ${
+                    isActive 
+                      ? 'bg-black text-white hover:bg-black/90' 
+                      : 'text-gray-400 hover:bg-gray-50'
+                  }`}
+                >
+                  <Icon size={20} weight={isActive ? 'fill' : 'regular'} />
+                </Button>
+              </Link>
+            );
+          })}
         </div>
-    </div>
-    <div data-layer="Profile settings" className="ProfileSettings self-stretch flex flex-col justify-start items-center gap-2">
-        <div data-layer="Separator" className="Separator self-stretch h-2 relative">
-                <div data-layer="Separator" className="Separator h-px left-[9px] top-[4px] w-full bg-black/10" />
+      </div>
+
+      <div className="ProfileSettings self-stretch flex flex-col justify-start items-center gap-2">
+        <div className="Separator self-stretch h-2 relative">
+          <div className="Separator h-px left-[9px] top-[4px] w-full bg-black/10" />
         </div>
-        <img data-layer="Profile Picture" data-show-profile-photo="on" className="ProfilePicture w-10 h-10 rounded-lg outline-1 outline-black/10" src="https://placehold.co/40x40" />
-    </div>
-    <div data-layer="Dock Icon" className="DockIcon w-6 h-6 left-[68px] top-[24px] absolute bg-Grays-White rounded outline outline-1 outline-black/5">
-      <Image
-        src = "/icons/Dock Icon.svg"
-        alt="Info icon"
-        width={40}
-        height={40}                
+        <img 
+          className="ProfilePicture w-10 h-10 rounded-lg outline-1 outline-black/10" 
+          src="https://placehold.co/40x40" 
+          alt="Profile"
         />
+      </div>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className="DockIcon w-6 h-6 absolute right-[-12px] top-6 bg-white rounded border-black/5 p-0"
+        onClick={handleToggle}
+      >
+        <Image
+          src="/icons/Dock Icon.svg"
+          alt="Expand sidebar"
+          width={12}
+          height={12}
+          className='!w-5 !h-5 text-gray-400'
+        />
+      </Button>
     </div>
-</div>
   );
 }
