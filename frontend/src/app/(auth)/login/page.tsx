@@ -11,28 +11,40 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleContinue = async () => {
-    setIsLoading(true);
-    try {
-      // TODO: Add authentication logic here
-      console.log("Email:", email);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Redirect to onboarding
-      router.push('/welcome');
-    } catch (error) {
-      console.error("Login failed:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const handleContinue = async () => {
+        setIsLoading(true);
+        let res: Response | undefined;
+        try {
+            // Call backend identify endpoint
+            res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001'}/auth/identify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+
+            if (!res.ok) {
+                const txt = await res.text();
+                throw new Error(`Login failed: ${res.status} ${txt}`);
+            }
+
+            const data = await res.json();
+            // store token
+            if (data.token) localStorage.setItem('authToken', data.token);
+
+            // Redirect to onboarding or dashboard
+            router.push('/welcome');
+        } catch (error) {
+            if (error instanceof Error) console.error('Login failed:', error.message);
+            else console.error('Login failed:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
   return (
     <div data-layer="Sign in/up-for professionals" className="SignInUpForProfessionals w-full h-screen bg-white inline-flex justify-center items-start overflow-hidden">
-    <div data-layer="Form Container" className="FormContainer max-w-screen-md flex-1 self-stretch px-10 pb-2 inline-flex flex-col justify-center items-center overflow-hidden">
-        <div data-layer="Form" className="Form self-stretch flex-1 pt-14 flex flex-col justify-center items-center gap-12">
+    <div data-layer="Form Container" className="FormContainer w-1/2 max-w-screen-md flex-1 self-stretch px-10 pb-2 inline-flex flex-col justify-center items-center overflow-hidden">
+        <div data-layer="Form" className="Form self-stretch max-w-[600px] flex-1 pt-14 flex flex-col justify-center items-center gap-12">
             <div data-layer="Header Container" className="HeaderContainer self-stretch flex flex-col justify-start items-start gap-1">
                 <div data-layer="Subtitle" className="Subtitle self-stretch text-center justify-start text-Labels-Primary text-3xl font-semibold font-['Inter_Tight'] leading-[48px] tracking-tight">AURA for professionals</div>
                 <div data-layer="Form Description" className="FormDescription self-stretch text-center justify-start text-Labels-Secondary/60 text-base font-medium font-['Inter_Tight']">Create an account or log in to manage your business.</div>
@@ -129,7 +141,7 @@ export default function Login() {
             </Button>
         </div>
     </div>
-    <div data-layer="Logo Container" className="LogoContainer w-[690px] self-stretch bg-gradient-to-b from-rose-100 to-white inline-flex flex-col justify-end items-center gap-2 overflow-hidden">
+    <div data-layer="Logo Container" className="LogoContainer w-1/2 self-stretch bg-gradient-to-b from-rose-100 to-white inline-flex flex-col justify-end items-center gap-2 overflow-hidden">
         <div data-layer="Logo Background Container" className="LogoBackgroundContainer self-stretch flex-1 p-28 relative flex flex-col justify-center items-center gap-2">
             <div data-layer="Logo Text" data-property-1="Default" className="LogoText self-stretch h-32 relative flex items-center justify-center">
               <Image
