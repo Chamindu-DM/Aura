@@ -1,12 +1,17 @@
 require('dotenv').config();
-const express = require("express")
-const mongoose = require('mongoose')
-const cors = require("cors")
-const path = require('path')
+const express = require("express");
+const mongoose = require('mongoose');
+const cors = require("cors");
+const path = require('path');
 
-const app = express()
-app.use(express.json())
-app.use(cors())
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    optionsSuccessStatus:200
+};
 
 const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://chamindudissanayake:tyBw0CtM58jySg8T@staging-application-db.cxapigh.mongodb.net/"
 
@@ -15,8 +20,11 @@ mongoose.connect(MONGO_URI)
     .catch(err => console.error('Mongo connection error:', err));
 
 // Mount auth routes
-const authRoutes = require('./routes/auth');
-app.use('/auth', authRoutes);
+const servicesRouter = require('./routes/services');
+const authRouter = require('./routes/auth');
+
+app.use('/api/services', servicesRouter);
+app.use('/auth', authRouter); // Or app.use('/api/auth', authRouter);
 
 // Simple health endpoint
 app.get('/', (req, res) => res.json({ ok: true }));

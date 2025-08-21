@@ -24,7 +24,7 @@ export default function Welcome() {
   };
 
   // Handle navigation to next step
-  const handleNext = () => {
+  const handleNext = async ()=>{
     console.log("Selected team size:", teamSize);
     console.log("Selected services:", selectedServices);
     
@@ -59,13 +59,43 @@ export default function Welcome() {
     localStorage.setItem('onboarding-services', JSON.stringify(selectedServices));
     localStorage.setItem('onboarding-team-size', teamSize);
 
-    // Show success message
-    toast.success("Profile information saved!");
+    const authToken = localStorage.getItem('authToken');
 
-    router.push('/business-info');
+    if(!authToken){
+        toast.error("Authentication failed. Please log in again.");
+        return;
+    }
+
+    try {
+        const res= await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profile`,{
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ${authToken}'
+            },
+            body:JSON.stringify({
+                firstName,
+                lastName,
+                selectedServices,
+                teamSize
+            })
+        });
+
+        if (!res.ok){
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to save profile information.');
+        }
+
+        toast.success("Profile information saved!");
+        router.push('/business-info');
+    } catch (error){
+        console.error("Error updating profile:", error);
+        toast.error("Failed to save profile information.");
+    }
+    
   };
   return (
-    <div data-layer="Onboarding Screen 1: Welcome! First Things First..." className="OnboardingScreen1WelcomeFirstThingsFirst py-10 bg-white flex  flex-col justify-center items-center gap-10 min-h-screen">
+    <div data-layer="Onboarding Screen 1: Welcome! First Things First..." className="OnboardingScreen1WelcomeFirstThingsFirst py-10 bg-white flex flex-col justify-center items-center gap-10 min-h-screen">
     <div data-layer="Header Container" className="HeaderContainer self-stretch py-10 border-b border-black/10 flex flex-col justify-start items-center gap-10">
         <div data-layer="Title Container" className="TitleContainer w-full max-w-[800px] flex flex-col justify-start items-center gap-2">
             <div data-layer="Title" className="Title self-stretch text-center justify-start text-gray-500 text-base font-medium font-['Inter_Tight'] leading-snug">Account setup</div>
