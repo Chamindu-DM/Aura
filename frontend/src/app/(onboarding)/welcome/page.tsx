@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ArrowRight, Plus, Minus} from 'lucide-react';
@@ -20,6 +20,11 @@ export default function Welcome() {
   const [lastName, setLastName] = useState<string>("");
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
   const toggleService = (service: string)=>{
     setSelectedServices(prev => prev.includes(service) ? prev.filter(s => s !== service)
@@ -85,12 +90,12 @@ export default function Welcome() {
         if (profilePic) {
             const formData = new FormData();
             formData.append('profilePic', profilePic);
-            formData.append('firstName', firstName);
+
 
             const uploadRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profile/picture`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': 'Bearer ${authToken}'
+                    'Authorization': `Bearer ${authToken}`
                 },
                 body: formData
             });
@@ -105,7 +110,7 @@ export default function Welcome() {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ${authToken}'
+                'Authorization': `Bearer ${authToken}`
             },
             body:JSON.stringify({
                 firstName,
@@ -151,7 +156,8 @@ export default function Welcome() {
                  data-show-profile-photo="off"
                  className="ProfilePicture w-24 h-24 bg-black/20 rounded-2xl outline-1 outline-black/10 flex flex-col justify-center items-center gap-2 overflow-hidden"
             >
-                {profilePic ? (
+                {/* Conditionally render this block only on the client */}
+                {isClient && profilePic ? (
                     <Image
                         src={URL.createObjectURL(profilePic)}
                         alt="Profile Preview"
@@ -165,7 +171,7 @@ export default function Welcome() {
 
             </div>
             <div data-layer="Change Picture Button"
-                 className="ChangePictureButton text-center justify-start text-black text-xs font-normal font-['Inter'] underline cursor-pointer"
+                 className="ChangePictureButton text-center justify-start text-black text-xs font-normal font-['Inter_Tight'] underline cursor-pointer"
                  onClick={handlePictureChangeClick}
             >
                 Change

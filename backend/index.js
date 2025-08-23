@@ -7,6 +7,8 @@ const path = require('path');
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 const corsOptions = {
     origin: 'http://localhost:3000',
@@ -19,17 +21,19 @@ mongoose.connect(MONGO_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Mongo connection error:', err));
 
-// Mount auth routes
+// Mount routes
 const servicesRouter = require('./routes/services');
 const authRouter = require('./routes/auth');
+const userRouter = require('./routes/user'); // <--- ADD THIS LINE
 
 app.use('/api/services', servicesRouter);
 app.use('/auth', authRouter); // Or app.use('/api/auth', authRouter);
+app.use('/api', userRouter); // <--- THIS LINE IS NOW CORRECT
 
 // Simple health endpoint
 app.get('/', (req, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-        console.log(`server is running on port ${PORT}`)
+    console.log(`server is running on port ${PORT}`)
 })
