@@ -73,4 +73,27 @@ router.put('/profile', auth, async(req, res)=>{
     }
 });
 
+// Endpoint: Handle salon information
+router.put('/profile/business-info', auth, async(req, res)=>{
+    try{
+        const{salonName, salonLocation} = req.body;
+
+        //Find the user by their ID from the decoded token
+        const user = await User.findById(req.user.userId);
+        if(!user){
+            return res.status(404).json({message: 'User not found'});
+        }
+
+        // Update the user's salon information
+        user.salonName= salonName;
+        user.salonLocation= salonLocation;
+
+        await user.save();
+        res.json({message: 'Salon information updated successfully', user});
+    } catch (err){
+        console.error(err);
+        res.status(500).json({message: 'Server error'});
+    }
+});
+
 module.exports=router;

@@ -2,103 +2,73 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
 
 // Identify or create a user by email, return JWT
 router.post('/identify', async (req, res) => {
-  const { email, firstName, lastName, selectedServices, teamSize } = req.body || {};
-  console.log('[auth] identify request body:', req.body);
-  if (!email) return res.status(400).json({ error: 'Email is required' });
+    const { email } = req.body;
+    console.log('[auth] identify request body:', req.body);
 
-  try {
-    console.log('[auth] Looking for user with email:', email);
-    let user = await User.findOne({ email });
-    
-    if (user) {
-      console.log('[auth] Found existing user:', user._id);
-      const token = jwt.sign(
-        {userId: user._id, email: user.email},
-        JWT_SECRET,
-        {expiresIn:'1h'}
-      );
-      return res.json({message: 'Login successful', token});
-
-    } else {
-      console.log('[auth] User not found, creating new user...');
-      // Case 2: New User (First-time login/onboarding)
-      // Create a new user account.
-      user = new User({ 
-        email, 
-        firstName: firstName || undefined,
-        lastName: lastName || undefined,
-        selectedServices: selectedServices || [],
-        teamSize: teamSize || undefined
-      });
-      console.log('[auth] About to save user:', user);
-      
-      const savedUser = await user.save();
-      console.log('[auth] User saved successfully:', savedUser._id, savedUser.email);
-
-      // Generate a token for the new user.
-      const token = jwt.sign(
-          { userId: savedUser._id, email: savedUser.email }, 
-          JWT_SECRET,
-          { expiresIn: '1h' }
-      );
-
-      // Respond with the token. The frontend will use this to
-      // redirect to the onboarding flow (/welcome).
-      return res.status(201).json({ message: 'User created and logged in', token, user: { id: savedUser._id, email: savedUser.email } });
+    if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
     }
 
-  }catch (error) {
+    try {
+        console.log('[auth] Looking for user with email:', email);
+        let user = await User.findOne({email});
+
+        if (user) {
+            // User exists. Send a flag to the frontend.
+            console.log('[auth] Found existing user:', user._id)
+            return res.status(200).json({message: 'User exists', isNewUser: false});
+        } else {
+            // User does not exist. Send a flag to the frontend.
+            console.log('[auth] User not found, creating new user...');
+            return res.status(200).json({message: 'User is new', isNewUser: true});
+        }
+    } catch (error) {
         console.error('Error in identify endpoint:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Update user profile information
-router.put('/profile', async (req, res) => {
-  const { email, firstName, lastName, selectedServices, teamSize } = req.body || {};
-  console.log('[auth] profile update request body:', req.body);
-  
-  if (!email) return res.status(400).json({ error: 'Email is required' });
+//Sign up a new user with email and password
+router.post('/signup', async (req, res) => {
+    const { email, password } = req.body;
 
-  try {
-    console.log('[auth] Looking for user to update with email:', email);
-    let user = await User.findOne({ email });
-    
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+    if (!email || !password) {
+        return res.status(400).json({message: 'Email and password are required'});
     }
 
-    // Update user fields
-    if (firstName !== undefined) user.firstName = firstName;
-    if (lastName !== undefined) user.lastName = lastName;
-    if (selectedServices !== undefined) user.selectedServices = selectedServices;
-    if (teamSize !== undefined) user.teamSize = teamSize;
+    if (password.length < 8 ||
+        !/[a-z]/.test(password) ||
+        !/[A-Z]/.test(password) ||
+        !/[0-9]/.test(password) ||
+        !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/.test(password)) {
+        return res.status(400).json({ message: 'Password does not meet strength requirements' });
+    }
 
-    console.log('[auth] About to update user:', user);
-    const updatedUser = await user.save();
-    console.log('[auth] User updated successfully:', updatedUser._id, updatedUser.email);
+    try{
+        let user = await User.findOne({email});
+        if (user) {
+            return res.status(409).json({message: 'User with that email already exists'});
+        }
+        user = new User({email, password});
+        const savedUser = await user.save();
 
-    res.json({ 
-      message: 'Profile updated successfully', 
-      user: { 
-        id: updatedUser._id, 
-        email: updatedUser.email, 
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        selectedServices: updatedUser.selectedServices,
-        teamSize: updatedUser.teamSize
-      } 
-    });
+        const token = jwt.sign(
+            { userId: savedUser._id, email: savedUser.email },
+            JWT_SECRET,
+            {expiresIn: '1h'}
+        );
 
-  } catch (error) {
-    console.error('Error in profile update endpoint:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
+        res.status(201).json({message: 'User created successfully', token});
+    } catch (err){
+        console.error(err);
+        res.status(500).json({message: 'Server error'});
+    }
 });
-
+//Login an existing user with email and password
 module.exports = router;

@@ -63,11 +63,45 @@ export default function SetupServices() {
   const removeOption = (id: string) =>
     setOptions((opts) => (opts.length > 1 ? opts.filter((o) => o.id !== id) : opts));
 
-  const handleSave = () => {
-    if (!serviceName.trim()) {
-      toast.error('Please enter a service name.');
-      return;
-    }
+  const handleSave = async () => {
+      if (!serviceName.trim()) {
+          toast.error('Please enter a service name.');
+          return;
+      }
+
+      const authToken = localStorage.getItem('authToken');
+      if (!authToken) {
+          toast.error('Authentication failed. Please log in again.');
+          return;
+      }
+
+      try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/services`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${authToken}`,
+              },
+              body: JSON.stringify({
+                  serviceName,
+                  description,
+                  multipleOptions,
+                  options,
+              }),
+          });
+
+          if (!res.ok) {
+              const errorData = await res.json();
+              throw new Error(errorData.message || 'Failed to save service information.');
+          }
+
+          toast.success('Service created successfully!');
+          router.push('/dashboard');
+      } catch (error) {
+          console.error("Error saving service information:", error);
+          toast.error('Failed to save service information.');
+      }
+  };
 
     localStorage.setItem(
       'service-data',
@@ -78,10 +112,6 @@ export default function SetupServices() {
         options,
       })
     );
-
-    toast.success('Service created successfully!');
-    router.push('/dashboard');
-  };
 
   const handleDelete = () => {
     toast.error('Service deleted');
@@ -169,8 +199,8 @@ export default function SetupServices() {
 
             {/* Remove button when multiple options and more than 1 row */}
             {multipleOptions && options.length > 1 && (
-              <div className="flex justify-end">
-                <Button variant="ghost" onClick={() => removeOption(opt.id)}>
+              <div className="flex justify-end font-['Inter_Tight']">
+                <Button variant="outline" onClick={() => removeOption(opt.id)}>
                   Remove
                 </Button>
               </div>

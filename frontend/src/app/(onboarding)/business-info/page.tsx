@@ -13,7 +13,7 @@ export default function BusinessInfo() {
     const [salonLocation, setSalonLocation] = useState<string>("");
     
   // Handle navigation to next step
-    const handleNext = () => {
+    const handleNext = async () => {
         if (!salonName.trim()) {
             toast.error("Please enter your salon name.");
             return;
@@ -23,12 +23,40 @@ export default function BusinessInfo() {
             return;
         }
 
-        // Store data in localStorage
-        localStorage.setItem('salon-name', salonName);
-        localStorage.setItem('salon-location', salonLocation);
+        const authToken = localStorage.getItem("authToken");
+        if(!authToken){
+            toast.error("Authentication failed. Please log in again.");
+            return;
+        }
 
-        toast.success("Salon profile created!");
-        router.push('/setup-services');
+        try{
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/profile/business-info`,{
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({
+                    salonName,
+                    salonLocation
+                })
+            });
+
+            if(!res.ok){
+                const errorData = await res.json();
+                throw new Error(errorData.message || 'Failed to save salon information');
+            }
+
+            //Store data in localStorage and navigate on success
+            localStorage.setItem('salon-name', salonName);
+            localStorage.setItem('salonLocation', salonLocation);
+
+            toast.success("Salon profile created!");
+            router.push('/setup-services');
+        } catch (error) {
+            console.error("Error updating salon profile:", error);
+            toast.error("Failed to save salon information");
+        }
     };
 
     return (
