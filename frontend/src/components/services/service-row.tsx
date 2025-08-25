@@ -17,11 +17,11 @@ export type Service = {
 
 export type ServiceRowProps = {
   service: Service
-  onToggle: (id: string, checked: boolean) => void
-  onSave: (data: any) => void
+  onToggleAction: (id: string, checked: boolean) => void
+  onSaveAction: (data: any) => void
 }
 
-export default function ServiceRow({ service, onToggle, onSave }: ServiceRowProps) {
+export default function ServiceRow({ service, onToggleAction, onSaveAction }: ServiceRowProps) {
     const textColorClass = service.available ? 'text-[#212121]' : 'text-gray-400';
     
     return (
@@ -34,7 +34,7 @@ export default function ServiceRow({ service, onToggle, onSave }: ServiceRowProp
             <div className="flex-shrink-0 w-20">
                 <Switch
                     checked={service.available}
-                    onCheckedChange={(checked) => onToggle(service.id, checked)}
+                    onCheckedChange={(checked) => onToggleAction(service.id, checked)}
                 />
             </div>
             <div className="flex-shrink-0 w-10 flex justify-center">
@@ -44,7 +44,7 @@ export default function ServiceRow({ service, onToggle, onSave }: ServiceRowProp
                             <ArrowsOutSimple size={24} className="text-[#212121]" />
                         </Button>
                     }
-                    onSave={onSave}
+                    onSave={onSaveAction}
                 />
             </div>
         </div>

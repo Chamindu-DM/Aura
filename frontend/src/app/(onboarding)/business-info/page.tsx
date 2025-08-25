@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { toast } from "sonner";
+import {getCookie} from "cookies-next";
 
 export default function BusinessInfo() {
     const router = useRouter();
@@ -23,9 +24,10 @@ export default function BusinessInfo() {
             return;
         }
 
-        const authToken = localStorage.getItem("authToken");
+        const authToken = getCookie("authToken");
         if(!authToken){
             toast.error("Authentication failed. Please log in again.");
+            router.push('/login');
             return;
         }
 

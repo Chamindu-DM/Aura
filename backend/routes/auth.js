@@ -34,7 +34,7 @@ router.post('/identify', async (req, res) => {
     }
 });
 
-//Sign up a new user with email and password
+// Sign up a new user with email and password
 router.post('/signup', async (req, res) => {
     const { email, password } = req.body;
 
@@ -53,7 +53,7 @@ router.post('/signup', async (req, res) => {
     try{
         let user = await User.findOne({email});
         if (user) {
-            return res.status(409).json({message: 'User with that email already exists'});
+            return res.status(409).json({message: 'User with that email already exists. Please log in instead.'});
         }
         user = new User({email, password});
         const savedUser = await user.save();
@@ -61,7 +61,7 @@ router.post('/signup', async (req, res) => {
         const token = jwt.sign(
             { userId: savedUser._id, email: savedUser.email },
             JWT_SECRET,
-            {expiresIn: '1h'}
+            {expiresIn: '7d'} // Changed to match frontend cookie expiry
         );
 
         res.status(201).json({message: 'User created successfully', token});
@@ -70,5 +70,58 @@ router.post('/signup', async (req, res) => {
         res.status(500).json({message: 'Server error'});
     }
 });
-//Login an existing user with email and password
+
+// Login an existing user with email and password
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    console.log('[auth] login request for email:', email);
+
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    try {
+        // Find user by email
+        const user = await User.findOne({ email: email.toLowerCase().trim() });
+
+        if (!user) {
+            console.log('[auth] User not found:', email);
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        // Compare password with hashed password in database
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            console.log('[auth] Invalid password for user:', email);
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign(
+            { userId: user._id, email: user.email },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        console.log('[auth] Login successful for user:', user._id);
+
+        res.status(200).json({
+            message: 'Login successful',
+            token,
+            onboardingCompleted: user.onboardingCompleted,
+            user: {
+                id: user._id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName
+            }
+        });
+
+    } catch (error) {
+        console.error('Error in login endpoint:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 module.exports = router;

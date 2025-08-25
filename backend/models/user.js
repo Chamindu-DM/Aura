@@ -44,6 +44,10 @@ const userSchema = new Schema({
       type: String,
         default: null,
     },
+    onboardingCompleted: {
+      type: Boolean,
+        default: false,
+    },
 }, { timestamps: true}
 );
 

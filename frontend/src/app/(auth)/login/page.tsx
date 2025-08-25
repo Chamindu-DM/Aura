@@ -3,16 +3,29 @@
 import Image from "next/image";
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
+import { getCookie } from "cookies-next";
 
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent)=>{
+    if(event.key === 'Enter'){
+            handleContinue();
+        }
+    }
+    document.addEventListener('keydown', handleKeyPress);
+    return () => {
+        document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [email, password]);
 
     const handleContinue = async () => {
         setIsLoading(true);
@@ -42,7 +55,12 @@ export default function Login() {
             }
 
             toast.success("Login successful!");
-            router.push('/welcome');
+            if(data.onboardingCompleted){
+                router.push('/dashboard');
+            }else{
+                router.push('/welcome');
+            }
+
         } catch (error) {
             console.error('Login failed:', error);
             if (error instanceof Error) toast.error(error.message);
@@ -134,7 +152,7 @@ export default function Login() {
                 </Button>
             </div>
         </div>
-        <div data-layer="Language Selector" className="LanguageSelector py-2 inline-flex w-full justify-center items-center gap-4">
+        <div data-layer="Language Selector" className="LanguageSelector py-2 inline-flex w-full justify-center items-center">
             <Button variant="link">
             <Image
                         src="/icons/globe.svg" 
@@ -145,7 +163,6 @@ export default function Login() {
                     />
                 <div data-layer="Language Text" className="LanguageText text-center justify-start text-blue-600 text-sm font-normal font-['Inter_Tight']">English</div>
             </Button>
-
             <Button variant="link">
             <Image
                         src="/icons/tube.svg" 

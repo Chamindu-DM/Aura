@@ -24,7 +24,7 @@ export default function Signup() {
     });
 
     const validatePassword = (pw: string, confirmPw?: string) => {
-        const confirmPassword = confirmPw !== undefined ? confirmPw : confirmPassword;
+        const confirmPwValue = confirmPw !== undefined ? confirmPw : confirmPassword;
 
         const validations = {
             minLength: pw.length >= 8,
@@ -32,7 +32,7 @@ export default function Signup() {
             hasUppercase: /[A-Z]/.test(pw),
             hasNumber: /[0-9]/.test(pw),
             hasSpecial: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/.test(pw),
-            passwordsMatch: pw === confirmPassword && pw.length > 0 && confirmPassword.length > 0,
+            passwordsMatch: pw === confirmPwValue && pw.length > 0 && confirmPwValue.length > 0,
         };
 
         setPasswordValidations(validations);

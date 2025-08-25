@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from "sonner";
 import { Input } from '@/components/ui/input';
 import { useRef} from "react";
+import {getCookie} from "cookies-next";
 
 export default function Welcome() {
     const router = useRouter();
@@ -70,9 +71,11 @@ export default function Welcome() {
         return;
     }
 
-    const authToken = localStorage.getItem('authToken');
+    const authToken = getCookie('authToken');
       if(!authToken){
           toast.error("Authentication failed. Please log in again.");
+          //Redirect to login page
+          router.push('/login');
           return;
       }
 

@@ -16,16 +16,17 @@ const optionSchema = new Schema({
     },
     notes: {
         type: String,
-    }
+        required: false
+    },
 });
 
 // Main schema for a service
 const serviceSchema = new Schema({
     // user who created this service
     userId:{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
+        required: true
     },
     //General service information
     serviceName:{
@@ -34,6 +35,7 @@ const serviceSchema = new Schema({
     },
     description:{
         type: String,
+        required: false
     },
     // A flag to know if this service has multiple options
     multipleOptions:{
@@ -41,9 +43,7 @@ const serviceSchema = new Schema({
         default: false,
     },
     // Array of options for this service
-    options:{
-    type: [optionSchema],
-    required: true,
-    },
-    });
+    options: [optionSchema]
+}, {timestamps: true});
+
  module.exports = mongoose.model('Service', serviceSchema);

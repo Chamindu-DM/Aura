@@ -7,7 +7,7 @@ export const useApi = (endpoint: string) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // API call logic will be implemented here
+    // API call logic
     setLoading(false);
   }, [endpoint]);
 

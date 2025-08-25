@@ -215,8 +215,8 @@ export default function ServicesPage() {
             <ServiceRow 
               key={service.id} 
               service={service} 
-              onToggle={handleServiceToggle} 
-              onSave={handleServiceSave} 
+              onToggleAction={handleServiceToggle} 
+              onSaveAction={handleServiceSave} 
             />
           ))}
         </div>
