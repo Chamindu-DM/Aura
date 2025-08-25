@@ -74,7 +74,7 @@ export default function Login() {
   return (
     <div data-layer="Sign in/up-for professionals" className="SignInUpForProfessionals w-full h-screen bg-white inline-flex justify-center items-start overflow-hidden">
     <div data-layer="Form Container" className="FormContainer w-1/2 max-w-screen-md flex-1 self-stretch px-10 pb-2 inline-flex flex-col justify-center items-center overflow-hidden">
-        <div data-layer="Form" className="Form self-stretch max-w-[600px] flex-1 pt-14 flex flex-col justify-center items-center gap-12">
+        <div data-layer="Form" className="Form self-stretch max-w-[600px] flex-1 pt-14 flex flex-col justify-center items-center gap-8">
             <div data-layer="Header Container" className="HeaderContainer self-stretch flex flex-col justify-start items-start gap-1">
                 <div data-layer="Subtitle" className="Subtitle self-stretch text-center justify-start text-Labels-Primary text-3xl font-semibold font-['Inter_Tight'] leading-[48px] tracking-tight">AURA for professionals</div>
                 <div data-layer="Form Description" className="FormDescription self-stretch text-center justify-start text-Labels-Secondary/60 text-base font-medium font-['Inter_Tight']">Create an account or log in to manage your business.</div>
@@ -151,28 +151,28 @@ export default function Login() {
                 <div data-layer="Language Text" className="LanguageText text-center justify-start text-blue-600 text-base font-medium font-['Inter_Tight']">Go to AURA for customers</div>
                 </Button>
             </div>
-        </div>
-        <div data-layer="Language Selector" className="LanguageSelector py-2 inline-flex w-full justify-center items-center">
-            <Button variant="link">
-            <Image
-                        src="/icons/globe.svg" 
+            <div data-layer="Language Selector" className="LanguageSelector max-w-[600px] py-2 inline-flex w-full justify-center items-center">
+                <Button variant="link">
+                    <Image
+                        src="/icons/globe.svg"
                         width={20}
                         height={20}
                         alt=""
                         priority
                     />
-                <div data-layer="Language Text" className="LanguageText text-center justify-start text-blue-600 text-sm font-normal font-['Inter_Tight']">English</div>
-            </Button>
-            <Button variant="link">
-            <Image
-                        src="/icons/tube.svg" 
+                    <div data-layer="Language Text" className="LanguageText text-center justify-start text-blue-600 text-sm font-normal font-['Inter_Tight']">English</div>
+                </Button>
+                <Button variant="link">
+                    <Image
+                        src="/icons/tube.svg"
                         width={20}
                         height={20}
                         alt=""
                         priority
                     />
-                <div data-layer="Language Text" className="LanguageText text-center justify-start text-blue-600 text-sm font-normal font-['Inter_Tight']">Help and support</div>
-            </Button>
+                    <div data-layer="Language Text" className="LanguageText text-center justify-start text-blue-600 text-sm font-normal font-['Inter_Tight']">Help and support</div>
+                </Button>
+            </div>
         </div>
     </div>
     <div data-layer="Logo Container" className="LogoContainer w-1/2 self-stretch bg-gradient-to-b from-rose-100 to-white inline-flex flex-col justify-end items-center gap-2 overflow-hidden">

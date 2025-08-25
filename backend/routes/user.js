@@ -65,6 +65,10 @@ router.put('/profile', auth, async(req, res)=>{
         user.selectedServices = selectedServices || user.selectedServices;
         user.teamSize = teamSize || user.teamSize;
 
+        if(selectedServices && selectedServices.length >0){
+            user.onboardingCompleted = true;
+        }
+
         await user.save();
         res.json({message: 'Profile updated successfully', user});
     } catch (err){
@@ -80,7 +84,6 @@ router.put('/profile/business-info', auth, async(req, res)=>{
 
         //Find the user by their ID from the decoded token
         const user = await User.findById(req.user.userId);
-
         if(!user){
             return res.status(404).json({message: 'User not found'});
         }
@@ -88,9 +91,6 @@ router.put('/profile/business-info', auth, async(req, res)=>{
         // Update the user's salon information
         user.salonName= salonName;
         user.salonLocation= salonLocation;
-
-        //Flag onboarding as complete at the final step
-        user.onobaordingCompleted = true;
 
         await user.save();
         res.json({message: 'Salon information updated successfully', user});
