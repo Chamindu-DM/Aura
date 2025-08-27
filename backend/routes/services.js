@@ -118,25 +118,24 @@ router.put('/:id', auth, async (req, res) => {
                     return res.status(400).json({message: `Option ${i+1} price is required`});
                 }
             }
+            //Update the service document
+            const updatedService = await Service.findOneAndUpdate(
+                {_id: serviceId, userId: userId },
+                {
+                    serviceName,
+                    description,
+                    multipleOptions,
+                    options
+                },
+                {new: true}
+            );
+
+            if (!updatedService) {
+                return res.status(404).json({message: 'Service not found or you are not authorized to edit it.'});
+            }
+
+            return res.status(200).json({message: 'Service updated successfully', service: updatedService});
         }
-
-        //Update the service document
-        const updatedService = await Service.findOneAndUpdate(
-            {_id: serviceId, userId: userId },
-            {
-                serviceName,
-                description,
-                multipleOptions,
-                options
-            },
-            {new: true}
-        );
-
-        if (!updatedService) {
-            return res.status(404).json({message: 'Service not found or you are not authorized to edit it.'});
-        }
-
-        return res.status(200).json({message: 'Service updated successfully', service: updatedService});
 
     } catch (err) {
         console.error(err);
