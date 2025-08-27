@@ -12,7 +12,7 @@ export default function DashboardLayout({
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       <div 
         data-layer="Container" 
         className={`Container w-full self-stretch inline-flex justify-start items-start overflow-hidden transition-all duration-300 ${

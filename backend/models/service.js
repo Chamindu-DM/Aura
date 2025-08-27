@@ -43,7 +43,12 @@ const serviceSchema = new Schema({
         default: false,
     },
     // Array of options for this service
-    options: [optionSchema]
+    options: [optionSchema],
+
+    available:{
+        type: Boolean,
+        default: true,
+    }
 }, {timestamps: true});
 
  module.exports = mongoose.model('Service', serviceSchema);
