@@ -14,12 +14,12 @@ import { useRouter } from 'next/navigation'
 import {
     MagnifyingGlass,
     Plus,
-    DotsThreeOutline,
     CaretUp,
     CaretDown,
     ArrowsOutSimple,
     Bell
 } from 'phosphor-react'
+import {MoreHorizontal} from "lucide-react";
 
 interface Service {
     _id: string;
@@ -252,7 +252,7 @@ export default function ServicesPage() {
     }
 
     return (
-        <main className="bg-white rounded-lg flex flex-col isolate items-start justify-start pb-10 pt-0 px-10 size-full">
+        <main className="bg-white rounded-lg flex flex-col px-10 pb-10 size-full">
             {/* Header */}
             <div className="flex flex-col gap-7 items-start justify-start overflow-hidden px-0 py-7 w-full z-[2]">
                 <div className="flex items-center justify-between w-full">
@@ -276,7 +276,7 @@ export default function ServicesPage() {
                             isEdit={false}
                         />
                         <Button variant="outline" size="icon" className="bg-[#fcfcfc] border-[1.5px] border-[rgba(92,92,92,0.2)] p-2 rounded-[10px]">
-                            <DotsThreeOutline size={20} />
+                            <MoreHorizontal className="h-5 w-5" />
                         </Button>
                     </div>
                 </div>
