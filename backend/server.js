@@ -24,11 +24,13 @@ mongoose.connect(MONGO_URI)
 // Mount routes
 const servicesRouter = require('./routes/services');
 const authRouter = require('./routes/auth');
-const userRouter = require('./routes/user'); // <--- ADD THIS LINE
+const userRouter = require('./routes/user');
+const teamMemberRouter = require('./routes/teamMembers');
 
 app.use('/api/services', servicesRouter);
 app.use('/auth', authRouter); // Or app.use('/api/auth', authRouter);
-app.use('/api', userRouter); // <--- THIS LINE IS NOW CORRECT
+app.use('/api', userRouter);
+app.use('/api/team-members', teamMemberRouter);
 
 // Simple health endpoint
 app.get('/', (req, res) => res.json({ ok: true }));
