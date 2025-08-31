@@ -16,24 +16,69 @@ const teamMemberSchema = new Schema({
     },
     avatar: {
         type: String,
+        required: false
+    },
+    status: {
+        type: String,
         enum: ['Available', 'On Leave', 'Custom Schedule'],
         default: 'Available',
         required: true
     },
     role: {
         type: String,
-        requiresd: true,
+        required: true,
         trim: true
     },
     hourlyRate: {
         type: String,
-        required: true
+        default: '$0/hr'
     },
     available: {
         type: Boolean,
         default: true
     },
     phone: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    email: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    address: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    // Bank account details
+    accountHolderName: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    accountNumber: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    ifscCode: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    routingNumber: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    bankName: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    bankAddress: {
         type: String,
         required: false,
         trim: true

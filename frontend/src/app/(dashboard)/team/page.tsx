@@ -1,11 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TeamTable } from '@/components/team/team-table'
-import { Plus } from 'phosphor-react'
+import { TeamMemberFormModal } from '@/components/team/team-member-form-modal'
+import { Plus, UsersThree } from 'phosphor-react'
+import {getCookie} from "cookies-next";
+import { toast} from "sonner";
+import { useRouter} from "next/navigation";
+import { z } from 'zod'
 
 interface TeamMember {
   id: string
@@ -17,30 +22,186 @@ interface TeamMember {
   available: boolean
 }
 
-const mockTeamMembers: TeamMember[] = [
-  { id: '1', name: 'Jonson Alice', status: 'Available', role: 'Stylist', hourlyRate: '$30/hr', available: true },
-  { id: '2', name: 'Smith John', status: 'Available', role: 'Hair dresser', hourlyRate: '$40', available: true },
-  { id: '3', name: 'Miller Emily', status: 'On Leave', role: 'Barber', hourlyRate: '$50', available: true },
-  { id: '4', name: 'Brown Olivia', status: 'Available', role: 'Colorist', hourlyRate: '$60', available: true },
-  { id: '5', name: 'Davis James', status: 'Custom Schedule', role: 'Salon assistant', hourlyRate: '$70', available: true },
-  { id: '6', name: 'Wilson Sophia', status: 'Custom Schedule', role: 'Manicurist', hourlyRate: '$80', available: true },
-  { id: '7', name: 'Taylor Daniel', status: 'Available', role: 'Esthetician', hourlyRate: '$90', available: false },
-  { id: '8', name: 'Clark Lily', status: 'Available', role: 'Extensions specialist', hourlyRate: '$100', available: false },
-  { id: '9', name: 'Moore Benjamin', status: 'On Leave', role: 'Makeup artist', hourlyRate: '$110', available: false },
-  { id: '10', name: 'Anderson Mia', status: 'Available', role: 'Waxing technician', hourlyRate: '$120', available: true },
-]
+// Form schema type for the modal
+const formSchema = z.object({
+    firstName: z.string().min(2, { message: 'First name is required.' }),
+    lastName: z.string().min(2, { message: 'Last name is required.' }),
+    phone: z.string().min(10, { message: 'Phone number is required.' }),
+    email: z.string().email({ message: 'Invalid email address.' }).optional().or(z.literal('')),
+    address: z.string().optional().or(z.literal('')),
+    jobTitle: z.string().min(2, { message: 'Job title is required.' }),
+    accountHolderName: z.string().optional().or(z.literal('')),
+    accountNumber: z.string().optional().or(z.literal('')),
+    ifscCode: z.string().optional().or(z.literal('')),
+    routingNumber: z.string().optional().or(z.literal('')),
+    bankName: z.string().optional().or(z.literal('')),
+    bankAddress: z.string().optional().or(z.literal('')),
+})
 
 export default function DashboardTeam() {
-  const [members, setMembers] = useState<TeamMember[]>(mockTeamMembers)
+  const [members, setMembers] = useState<TeamMember[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+    const router = useRouter()
 
-  const handleToggleAvailability = (id: string, available: boolean) => {
-    setMembers(prev => prev.map(member => 
-      member.id === id ? { ...member, available } : member
-    ))
-  }
+    // Fetch team members from backend
+    const fetchTeamMembers = async () => {
+        const authToken = getCookie('authToken');
+        if(!authToken){
+            toast.error("Authentication failed. Please log in again.");
+            router.push('/login');
+            return;
+        }
 
-  const handleExpandDetails = (id: string) => {
-    console.log('Expand details for member:', id)
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/team-members`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to fetch team members');
+            }
+
+            const data = await res.json();
+            // Transform backend data to match frontend interface
+            const transformedMembers = data.members.map((member: any) => ({
+                id: member._id,
+                name: member.name,
+                avatar: member.avatar,
+                status: member.status,
+                role: member.role,
+                hourlyRate: member.hourlyRate,
+                available: member.available
+            }));
+
+            setMembers(transformedMembers);
+        } catch (error) {
+            console.error('Error fetching team members:', error);
+            toast.error('Failed to load team members. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Load team members on component mount
+    useEffect(() => {
+        fetchTeamMembers();
+    }, []);
+
+    const handleToggleAvailability = async (id: string, available: boolean) => {
+        const authToken = getCookie('authToken');
+        if(!authToken){
+            toast.error("Authentication failed. Please log in again.");
+            router.push('/login');
+            return;
+        }
+
+        // Optimistic update
+        setMembers(prev =>prev.map(member =>
+            member.id === id ? {...member, available} : member
+        ));
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/team-members/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({available})
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to toggle availability');
+            }
+
+            toast.success(`Availability updated successfully!`);
+        } catch (error) {
+            console.error('Error toggling availability:', error);
+            toast.error('Failed to update availability. Please try again.');
+
+            // Revert optimistic update on error
+            setMembers(prev =>prev.map( member =>
+                member.id === id ? {...member, available: !available} : member
+            ));
+        }
+    };
+
+    const handleExpandDetails = (id: string) => {
+        console.log('Expand details for member:', id)
+        // TODO: Implement member details view
+    }
+
+    const handleAddNewMember = async (formData: z.infer<typeof formSchema>) => {
+        const authToken = getCookie('authToken');
+        if(!authToken){
+            toast.error("Authentication failed. Please log in again.");
+            router.push('/login');
+            return;
+        }
+
+        try {
+            // Transform form data to match backend expectations
+            const memberData = {
+                name: `${formData.firstName} ${formData.lastName}`,
+                phone: formData.phone,
+                email: formData.email || '',
+                address: formData.address || '',
+                role: formData.jobTitle,
+                accountHolderName: formData.accountHolderName || '',
+                accountNumber: formData.accountNumber || '',
+                ifscCode: formData.ifscCode || '',
+                routingNumber: formData.routingNumber || '',
+                bankName: formData.bankName || '',
+                bankAddress: formData.bankAddress || '',
+                status: 'Available',
+                available: true,
+                hourlyRate: '$0/hr'
+            };
+
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/team-members`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify(memberData)
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to add team member');
+            }
+
+            const data = await res.json();
+
+            // Add the new member to the local state
+            const newMember: TeamMember = {
+                id: data.member._id,
+                name: data.member.name,
+                avatar: data.member.avatar,
+                status: data.member.status,
+                role: data.member.role,
+                hourlyRate: data.member.hourlyRate,
+                available: data.member.available
+            };
+
+            setMembers(prev => [...prev, newMember]);
+            toast.success('Team member added successfully!');
+        } catch (error) {
+            console.error('Error adding team member:', error);
+            toast.error('Failed to add team member. Please try again.');
+        }
+    };
+
+    if(isLoading){
+    return (
+      <div className="flex items-center justify-center h-screen gap-2">
+        <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-black"></div>
+        <p>Loading team members...</p>
+      </div>
+    );
   }
 
   return (
@@ -56,12 +217,9 @@ export default function DashboardTeam() {
               Easily add, remove, or edit team members and their roles.
             </p>
           </div>
-          
+
           <div className="flex gap-3 py-1">
-            <Button className="bg-black text-white px-5 py-2 rounded-lg font-['Inter_Tight'] font-medium text-base flex items-center gap-2">
-              <Plus size={24} />
-              Add New Member
-            </Button>
+            <TeamMemberFormModal onSave={handleAddNewMember} />
             <Button variant="outline" size="icon" className="bg-neutral-50 border-zinc-600/20 p-2 rounded-[10px]">
                 <MoreHorizontal className="h-5 w-5" />
             </Button>
@@ -90,11 +248,21 @@ export default function DashboardTeam() {
         </div>
 
         {/* Team Table */}
-        <TeamTable 
-          members={members}
-          onToggleAvailability={handleToggleAvailability}
-          onExpandDetails={handleExpandDetails}
-        />
+        {members.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="text-gray-400 mb-4">
+                <UsersThree size={64} />     </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2 font-['Inter_Tight']">No team members yet</h3>
+            <p className="text-gray-500 mb-6 font-['Inter_Tight']">Get started by adding your first team member to manage your salon staff.</p>
+            <TeamMemberFormModal onSave={handleAddNewMember} />
+          </div>
+        ) : (
+          <TeamTable
+            members={members}
+            onToggleAvailability={handleToggleAvailability}
+            onExpandDetails={handleExpandDetails}
+          />
+        )}
       </div>
     </main>
   );
