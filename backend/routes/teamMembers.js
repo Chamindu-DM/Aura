@@ -7,7 +7,7 @@ const TeamMember = require('../models/teamMember');
 router.get('/', auth, async (req,res) =>
 {
     try{
-        const members = await TeamMember.find({userId: req.user.id});
+        const members = await TeamMember.find({userId: req.user.userId}); // Fix: Use userId instead of id
         res.status(200).json({members});
     } catch (error){
         console.error('Error fetching team members:', error);
@@ -20,7 +20,7 @@ router.post('/', auth, async (req, res) => {
     try {
         const newMember = new TeamMember({
             ...req.body,
-            userId: req.user.id
+            userId: req.user.userId // Fix: Use userId instead of id
         });
 
         await newMember.save();
@@ -36,7 +36,7 @@ router.put('/:id', auth, async(req, res) => {
     const {id} = req.params;
     try{
         const member = await TeamMember.findOneAndUpdate(
-            {_id:id, userId: req.user.id},
+            {_id:id, userId: req.user.userId}, // Fix: Use userId instead of id
             req.body,
             {new: true, runValidators: true}
         );
@@ -56,7 +56,7 @@ router.put('/:id', auth, async(req, res) => {
 router.delete('/:id', auth, async (req, res) =>{
     const {id} = req.params;
     try {
-        const member = await TeamMember.findOneAndDelete({_id: id, userId: req.user.id });
+        const member = await TeamMember.findOneAndDelete({_id: id, userId: req.user.userId }); // Fix: Use userId instead of id
 
         if(!member){
             return res.status(404).json({message: 'Team member not found or you are not authorized to delete it.'});

@@ -9,7 +9,12 @@ const teamMemberSchema = new Schema({
         required: true
     },
 
-    name: {
+    firstName: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    lastName: {
         type: String,
         required: true,
         trim: true
@@ -59,16 +64,6 @@ const teamMemberSchema = new Schema({
         trim: true
     },
     accountNumber: {
-        type: String,
-        required: false,
-        trim: true
-    },
-    ifscCode: {
-        type: String,
-        required: false,
-        trim: true
-    },
-    routingNumber: {
         type: String,
         required: false,
         trim: true

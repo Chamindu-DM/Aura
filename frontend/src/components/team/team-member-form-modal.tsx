@@ -38,8 +38,6 @@ const formSchema = z.object({
     jobTitle: z.string().min(2, { message: 'Job title is required.' }),
     accountHolderName: z.string().optional().or(z.literal('')),
     accountNumber: z.string().optional().or(z.literal('')),
-    ifscCode: z.string().optional().or(z.literal('')),
-    routingNumber: z.string().optional().or(z.literal('')),
     bankName: z.string().optional().or(z.literal('')),
     bankAddress: z.string().optional().or(z.literal('')),
 })
@@ -59,8 +57,6 @@ export function TeamMemberFormModal({ onSave }: TeamMemberFormModalProps) {
             jobTitle: '',
             accountHolderName: '',
             accountNumber: '',
-            ifscCode: '',
-            routingNumber: '',
             bankName: '',
             bankAddress: '',
         },

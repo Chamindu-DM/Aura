@@ -32,8 +32,6 @@ const formSchema = z.object({
     jobTitle: z.string().min(2, { message: 'Job title is required.' }),
     accountHolderName: z.string().optional().or(z.literal('')),
     accountNumber: z.string().optional().or(z.literal('')),
-    ifscCode: z.string().optional().or(z.literal('')),
-    routingNumber: z.string().optional().or(z.literal('')),
     bankName: z.string().optional().or(z.literal('')),
     bankAddress: z.string().optional().or(z.literal('')),
 })
@@ -145,15 +143,14 @@ export default function DashboardTeam() {
         try {
             // Transform form data to match backend expectations
             const memberData = {
-                name: `${formData.firstName} ${formData.lastName}`,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
                 phone: formData.phone,
                 email: formData.email || '',
                 address: formData.address || '',
                 role: formData.jobTitle,
                 accountHolderName: formData.accountHolderName || '',
                 accountNumber: formData.accountNumber || '',
-                ifscCode: formData.ifscCode || '',
-                routingNumber: formData.routingNumber || '',
                 bankName: formData.bankName || '',
                 bankAddress: formData.bankAddress || '',
                 status: 'Available',
@@ -179,7 +176,7 @@ export default function DashboardTeam() {
             // Add the new member to the local state
             const newMember: TeamMember = {
                 id: data.member._id,
-                name: data.member.name,
+                name: `${data.member.firstName} ${data.member.lastName}`, // Combine firstName and lastName from response
                 avatar: data.member.avatar,
                 status: data.member.status,
                 role: data.member.role,
