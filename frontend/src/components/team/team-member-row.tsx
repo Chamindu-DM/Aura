@@ -45,7 +45,7 @@ export function TeamMemberRow({ member, onToggleAvailability, onExpandDetails }:
         <Avatar className="w-6 h-6">
           <AvatarImage src={member.avatar} />
           <AvatarFallback className="text-xs">
-            {member.name.split(' ').map(n => n[0]).join('')}
+            {member.name?.split(' ').map(n => n[0]).join('') || 'N/A'}
           </AvatarFallback>
         </Avatar>
         <span className="text-neutral-800 text-base font-medium font-['Inter_Tight']">

@@ -66,7 +66,7 @@ export default function DashboardTeam() {
             // Transform backend data to match frontend interface
             const transformedMembers = data.members.map((member: any) => ({
                 id: member._id,
-                name: member.name,
+                name: member.name || `${member.firstName || ''} ${member.lastName || ''}`.trim(),
                 avatar: member.avatar,
                 status: member.status,
                 role: member.role,
