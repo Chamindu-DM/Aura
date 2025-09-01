@@ -9,9 +9,18 @@ import {
   Gear, 
   UsersThree, 
   Clock, 
-  CaretRight 
+  CaretRight,
+  CaretDown,
+  SignOut
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
+import { useAuthContext } from "@/providers/auth-provider";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface SidebarProps {
   onToggle?: (expanded: boolean) => void;
@@ -20,11 +29,44 @@ interface SidebarProps {
 export default function Sidebar({ onToggle }: SidebarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const pathname = usePathname();
+  const { user, logout } = useAuthContext();
 
   const handleToggle = () => {
     const newState = !isExpanded;
     setIsExpanded(newState);
     onToggle?.(newState);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  // Get user display name
+  const getUserDisplayName = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    if (user?.firstName) {
+      return user.firstName;
+    }
+    if (user?.email) {
+      return user.email.split('@')[0];
+    }
+    return 'User';
+  };
+
+  // Get user initials for avatar fallback
+  const getUserInitials = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    }
+    if (user?.firstName) {
+      return user.firstName[0].toUpperCase();
+    }
+    if (user?.email) {
+      return user.email[0].toUpperCase();
+    }
+    return 'U';
   };
 
   const menuItems = [
@@ -144,20 +186,42 @@ export default function Sidebar({ onToggle }: SidebarProps) {
           <div className="flex flex-col gap-2 items-center py-1 w-full">
             <div className="h-px w-full bg-black/10" />
           </div>
-          <div className="flex h-10 items-center justify-between w-full">
-            <div className="flex gap-2 items-center">
-              <div 
-                className="w-10 h-10 rounded-lg border border-black/10 bg-cover bg-center"
-                style={{ backgroundImage: 'url(https://placehold.co/40x40)' }}
-              />
-              <div className="flex flex-col">
-                <span className="font-['Inter_Tight'] font-semibold text-[15px] leading-[20px] text-black/50">
-                  Josh Smith
-                </span>
-              </div>
-            </div>
-            <CaretRight size={24} className="text-black/50" />
-          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex h-10 items-center justify-between w-full p-0 hover:bg-gray-50">
+                <div className="flex gap-2 items-center">
+                  <div className="w-10 h-10 rounded-lg border border-black/10 bg-gray-100 flex items-center justify-center overflow-hidden">
+                    {user?.profilePhoto ? (
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${user.profilePhoto}`}
+                        alt="Profile"
+                        width={40}
+                        height={40}
+                        className="object-cover w-full h-full"
+                      />
+                    ) : (
+                      <span className="font-['Inter_Tight'] font-semibold text-sm text-black/70">
+                        {getUserInitials()}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-['Inter_Tight'] font-semibold text-[15px] leading-[20px] text-black/70 text-left">
+                      {getUserDisplayName()}
+                    </span>
+                  </div>
+                </div>
+                <CaretDown size={16} className="text-black/50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                <SignOut size={16} className="mr-2" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     );
@@ -211,11 +275,34 @@ export default function Sidebar({ onToggle }: SidebarProps) {
         <div className="Separator self-stretch h-2 relative">
           <div className="Separator h-px left-[9px] top-[4px] w-full bg-black/10" />
         </div>
-        <img 
-          className="ProfilePicture w-10 h-10 rounded-lg outline-1 outline-black/10" 
-          src="https://placehold.co/40x40" 
-          alt="Profile"
-        />
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="w-10 h-10 p-0 hover:bg-gray-50">
+              <div className="w-10 h-10 rounded-lg border border-black/10 bg-gray-100 flex items-center justify-center overflow-hidden">
+                {user?.profilePhoto ? (
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${user.profilePhoto}`}
+                    alt="Profile"
+                    width={40}
+                    height={40}
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <span className="font-['Inter_Tight'] font-semibold text-sm text-black/70">
+                    {getUserInitials()}
+                  </span>
+                )}
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+              <SignOut size={16} className="mr-2" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <Button

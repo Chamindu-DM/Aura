@@ -100,4 +100,29 @@ router.put('/profile/business-info', auth, async(req, res)=>{
     }
 });
 
+// Get current user profile
+router.get('/me', auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({
+            user: {
+                id: user._id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                profilePhoto: user.profilePic,
+                salonName: user.salonName,
+                salonLocation: user.salonLocation
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 module.exports=router;

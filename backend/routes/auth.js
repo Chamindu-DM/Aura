@@ -124,4 +124,18 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// Logout endpoint
+router.post('/logout', async (req, res) => {
+    try {
+        // In a JWT-based system, logout is primarily handled on the client side
+        // by removing the token. However, we can add server-side logic if needed
+        // such as token blacklisting for enhanced security
+
+        res.status(200).json({ message: 'Logout successful' });
+    } catch (error) {
+        console.error('Error in logout endpoint:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 module.exports = router;
