@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TeamTable } from '@/components/team/team-table'
 import { TeamMemberFormModal } from '@/components/team/team-member-form-modal'
-import { Plus, UsersThree } from 'phosphor-react'
+import { UsersThree } from 'phosphor-react'
 import {getCookie} from "cookies-next";
 import { toast} from "sonner";
 import { useRouter} from "next/navigation";
@@ -20,6 +20,13 @@ interface TeamMember {
   role: string
   hourlyRate: string
   available: boolean
+  phone?: string
+  email?: string
+  address?: string
+  accountHolderName?: string
+  accountNumber?: string
+  bankName?: string
+  bankAddress?: string
 }
 
 // Form schema type for the modal
@@ -39,6 +46,8 @@ const formSchema = z.object({
 export default function DashboardTeam() {
   const [members, setMembers] = useState<TeamMember[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [selectedMember, setSelectedMember] = useState<any | null>(null);
     const router = useRouter()
 
     // Fetch team members from backend
@@ -128,9 +137,24 @@ export default function DashboardTeam() {
     };
 
     const handleExpandDetails = (id: string) => {
-        console.log('Expand details for member:', id)
-        // TODO: Implement member details view
-    }
+        const member = members.find(m => m.id === id);
+        if (member) {
+            // Map member fields to form fields
+            setSelectedMember({
+                firstName: member.name.split(' ')[0] || '',
+                lastName: member.name.split(' ').slice(1).join(' ') || '',
+                phone: member.phone || '',
+                email: member.email || '',
+                address: member.address || '',
+                jobTitle: member.role || '',
+                accountHolderName: member.accountHolderName || '',
+                accountNumber: member.accountNumber || '',
+                bankName: member.bankName || '',
+                bankAddress: member.bankAddress || '',
+            });
+            setEditModalOpen(true);
+        }
+    };
 
     const handleAddNewMember = async (formData: z.infer<typeof formSchema>) => {
         const authToken = getCookie('authToken');
@@ -189,6 +213,56 @@ export default function DashboardTeam() {
         } catch (error) {
             console.error('Error adding team member:', error);
             toast.error('Failed to add team member. Please try again.');
+        }
+    };
+
+    const handleUpdateMember = async (formData: z.infer<typeof formSchema>) => {
+        const authToken = getCookie('authToken');
+        if(!authToken){
+            toast.error("Authentication failed. Please log in again.");
+            router.push('/login');
+            return;
+        }
+        try {
+            // Find the member to update
+            const memberToUpdate = members.find(m => m.name.split(' ')[0] === formData.firstName && m.name.split(' ').slice(1).join(' ') === formData.lastName);
+            if (!memberToUpdate) {
+                toast.error('Member not found.');
+                return;
+            }
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/team-members/${memberToUpdate.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    phone: formData.phone,
+                    email: formData.email || '',
+                    address: formData.address || '',
+                    role: formData.jobTitle,
+                    accountHolderName: formData.accountHolderName || '',
+                    accountNumber: formData.accountNumber || '',
+                    bankName: formData.bankName || '',
+                    bankAddress: formData.bankAddress || '',
+                })
+            });
+            if (!res.ok) {
+                throw new Error('Failed to update team member');
+            }
+            const data = await res.json();
+            setMembers(prev => prev.map(m => m.id === memberToUpdate.id ? {
+                ...m,
+                name: `${data.member.firstName} ${data.member.lastName}`,
+                role: data.member.role,
+                // Add other fields as needed
+            } : m));
+            toast.success('Team member updated successfully!');
+        } catch (error) {
+            console.error('Error updating team member:', error);
+            toast.error('Failed to update team member. Please try again.');
         }
     };
 
@@ -254,11 +328,20 @@ export default function DashboardTeam() {
             <TeamMemberFormModal onSave={handleAddNewMember} />
           </div>
         ) : (
-          <TeamTable
-            members={members}
-            onToggleAvailability={handleToggleAvailability}
-            onExpandDetails={handleExpandDetails}
-          />
+          <>
+            <TeamTable
+              members={members}
+              onToggleAvailability={handleToggleAvailability}
+              onExpandDetails={handleExpandDetails}
+            />
+            <TeamMemberFormModal
+                open={editModalOpen}
+                setOpen={setEditModalOpen}
+                member={selectedMember}
+                onUpdate={handleUpdateMember}
+                onSave={() => {}}
+            />
+          </>
         )}
       </div>
     </main>

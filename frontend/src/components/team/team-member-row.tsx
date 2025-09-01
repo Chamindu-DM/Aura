@@ -87,7 +87,7 @@ export function TeamMemberRow({ member, onToggleAvailability, onExpandDetails }:
 
       {/* Actions Column */}
       <div className="w-10 flex justify-center">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={() => onExpandDetails(member.id)}>
               <ArrowsOutSimple size={24} className="text-[#212121]" />
           </Button>
       </div>

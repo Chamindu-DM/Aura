@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import {
     Dialog,
     DialogContent,
@@ -25,7 +26,11 @@ import { z } from 'zod'
 import { useState } from 'react'
 
 interface TeamMemberFormModalProps {
-    onSave: (data: z.infer<typeof formSchema>) => void
+    onSave: (data: z.infer<typeof formSchema>) => void;
+    onUpdate?: (data: z.infer<typeof formSchema>) => void;
+    member?: Partial<z.infer<typeof formSchema>> | null;
+    open?: boolean;
+    setOpen?: (open: boolean) => void;
 }
 
 // 1. Define the Zod schema for validation.
@@ -42,13 +47,27 @@ const formSchema = z.object({
     bankAddress: z.string().optional().or(z.literal('')),
 })
 
-export function TeamMemberFormModal({ onSave }: TeamMemberFormModalProps) {
-    const [open, setOpen] = useState(false)
+export function TeamMemberFormModal({ onSave, onUpdate, member, open: controlledOpen, setOpen: setControlledOpen }: TeamMemberFormModalProps) {
+    const isEditMode = !!member;
+    const [internalOpen, setInternalOpen] = useState(false);
+    const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+    const setOpen = setControlledOpen !== undefined ? setControlledOpen : setInternalOpen;
 
     // 2. Define the form with React Hook Form.
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
+        defaultValues: member ? {
+            firstName: member.firstName || '',
+            lastName: member.lastName || '',
+            phone: member.phone || '',
+            email: member.email || '',
+            address: member.address || '',
+            jobTitle: member.jobTitle || '',
+            accountHolderName: member.accountHolderName || '',
+            accountNumber: member.accountNumber || '',
+            bankName: member.bankName || '',
+            bankAddress: member.bankAddress || '',
+        } : {
             firstName: '',
             lastName: '',
             phone: '',
@@ -60,37 +79,55 @@ export function TeamMemberFormModal({ onSave }: TeamMemberFormModalProps) {
             bankName: '',
             bankAddress: '',
         },
-    })
+    });
+
+    // Reset form when member changes (for edit mode)
+    React.useEffect(() => {
+        if (member) {
+            form.reset({
+                firstName: member.firstName || '',
+                lastName: member.lastName || '',
+                phone: member.phone || '',
+                email: member.email || '',
+                address: member.address || '',
+                jobTitle: member.jobTitle || '',
+                accountHolderName: member.accountHolderName || '',
+                accountNumber: member.accountNumber || '',
+                bankName: member.bankName || '',
+                bankAddress: member.bankAddress || '',
+            });
+        } else {
+            form.reset();
+        }
+    }, [member]);
 
     // 3. Define the submission handler.
     function onSubmit(data: z.infer<typeof formSchema>) {
-        //process the data here before sending it to the parent.
-        const memberData = {
-            name: `${data.firstName} ${data.lastName}`,
-            phone: data.phone,
-            email: data.email,
-            address: data.address,
-            role: data.jobTitle, // 'role' is the backend field for 'jobTitle'
-        };
-
-        onSave(data) // Pass the full data object to the parent
-        setOpen(false) // Close the modal on success
-        form.reset()
+        if (isEditMode && onUpdate) {
+            onUpdate(data);
+        } else {
+            onSave(data);
+        }
+        setOpen(false);
+        form.reset();
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button className="bg-black text-white px-5 py-2 rounded-lg font-['Inter_Tight'] font-medium text-base flex items-center gap-2">
-                    <Plus size={24} />
-                    Add New Member
-                </Button>
-            </DialogTrigger>
+            {/* Only show trigger if not controlled by parent */}
+            {!controlledOpen && (
+                <DialogTrigger asChild>
+                    <Button className="bg-black text-white px-5 py-2 rounded-lg font-['Inter_Tight'] font-medium text-base flex items-center gap-2">
+                        <Plus size={24} />
+                        Add New Member
+                    </Button>
+                </DialogTrigger>
+            )}
             <DialogContent className="sm:max-w-[760px] max-h-[80vh] overflow-y-auto font-['Inter_Tight']">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold">Add New Team Member</DialogTitle>
+                    <DialogTitle className="text-2xl font-bold">{isEditMode ? 'Edit Team Member' : 'Add New Team Member'}</DialogTitle>
                     <DialogDescription>
-                        Enter the details for the new team member here. Click save when you're done.
+                        {isEditMode ? 'Update the details for this team member. Click save when you\'re done.' : 'Enter the details for the new team member here. Click save when you\'re done.'}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -281,8 +318,8 @@ export function TeamMemberFormModal({ onSave }: TeamMemberFormModalProps) {
                             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit">
-                                Add Member
+                            <Button type="submit" className="w-full bg-black text-white mt-4">
+                                {isEditMode ? 'Update Member' : 'Save Member'}
                             </Button>
                         </div>
                     </form>
