@@ -325,7 +325,6 @@ export default function DashboardTeam() {
                 <UsersThree size={64} />     </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2 font-['Inter_Tight']">No team members yet</h3>
             <p className="text-gray-500 mb-6 font-['Inter_Tight']">Get started by adding your first team member to manage your salon staff.</p>
-            <TeamMemberFormModal onSave={handleAddNewMember} />
           </div>
         ) : (
           <>
