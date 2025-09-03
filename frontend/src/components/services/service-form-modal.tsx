@@ -227,7 +227,7 @@ export function ServiceFormModal({
                                 />
 
                                 {multipleOptions && options.length > 1 && (
-                                    <div className="flex justify-end">
+                                    <div className="flex justify-end font-['Inter_Tight']">
                                         <Button variant="ghost" onClick={() => removeOption(opt.id)}>
                                             Remove
                                         </Button>
