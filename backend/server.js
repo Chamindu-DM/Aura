@@ -28,6 +28,7 @@ const userRouter = require('./routes/user');
 const teamMemberRouter = require('./routes/teamMembers');
 const appointmentsRouter = require('./routes/appointments');
 
+// Define routes
 app.use('/api/services', servicesRouter);
 app.use('/auth', authRouter); // Or app.use('/api/auth', authRouter);
 app.use('/api', userRouter);

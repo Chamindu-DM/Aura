@@ -1,186 +1,270 @@
 const express = require('express');
 const router = express.Router();
-const Appointment = require('../models/appointment');
 const auth = require('../middleware/auth');
+const Appointment = require('../models/appointment');
 
-// Get all appointments
+// Get all appointments for a logged-in user
 router.get('/', auth, async (req, res) => {
     try {
-        const appointments = await Appointment.find({ createdBy: req.userId })
+        const userId = req.user.userId;
+        const appointments = await Appointment.find({ createdBy: userId })
             .populate('serviceId', 'serviceName price')
             .populate('assignedStaff', 'firstName lastName role')
-            .sort({ date: 1, time: 1 });
+            .sort({ date: 1, time: 1 })
+            .lean();
 
-        res.json({
-            success: true,
-            appointments
-        });
-    } catch (error) {
-        console.error('Error fetching appointments:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Server error while fetching appointments'
-        });
-    }
-});
-
-// Get appointments by date range
-router.get('/date-range', auth, async (req, res) => {
-    try {
-        const { startDate, endDate } = req.query;
-
-        const query = { createdBy: req.userId };
-        if (startDate && endDate) {
-            query.date = {
-                $gte: new Date(startDate),
-                $lte: new Date(endDate)
-            };
-        }
-
-        const appointments = await Appointment.find(query)
-            .populate('serviceId', 'serviceName price')
-            .populate('assignedStaff', 'firstName lastName role')
-            .sort({ date: 1, time: 1 });
-
-        res.json({
-            success: true,
-            appointments
-        });
-    } catch (error) {
-        console.error('Error fetching appointments by date range:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Server error while fetching appointments'
-        });
+        res.status(200).json({ appointments });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
 // Create new appointment
 router.post('/', auth, async (req, res) => {
     try {
+        const userId = req.user.userId;
+        const {
+            customerName,
+            customerType,
+            customerPhone,
+            customerEmail,
+            date,
+            time,
+            duration,
+            serviceCount,
+            genderType,
+            serviceName,
+            serviceId,
+            assignedStaff,
+            price,
+            notes
+        } = req.body;
+
+        // Validate required fields
+        if (!customerName || !customerName.trim()) {
+            return res.status(400).json({message: 'Customer name is required'});
+        }
+        if (!date) {
+            return res.status(400).json({message: 'Date is required'});
+        }
+        if (!time) {
+            return res.status(400).json({message: 'Time is required'});
+        }
+
+        // Create appointment data object
         const appointmentData = {
-            ...req.body,
-            createdBy: req.userId
+            createdBy: userId,
+            customerName: customerName.trim(),
+            customerType: customerType || 'Non-Member',
+            customerPhone: customerPhone.trim() || '',
+            customerEmail: customerEmail.trim() || '',
+            date,
+            time,
+            serviceCount: serviceCount || '1 service',
+            genderType: genderType || 'Unisex',
+            notes: notes?.trim() || '',
+            status: 'Scheduled'
         };
 
-        const appointment = new Appointment(appointmentData);
-        await appointment.save();
+        //Handle service-related data
+        if (serviceId) {
+            //if service id is provided, get service details from the service model
+            const Service = require('../models/service');
+            const service = await Service.findById(serviceId);
 
-        // Populate the created appointment before sending response
-        const populatedAppointment = await Appointment.findById(appointment._id)
+            if (service) {
+                appointmentData.serviceId = serviceId;
+                appointmentData.serviceName = service.serviceName || serviceName;
+
+                // For duration and price, check if the service has options
+                if (service.options && service.options.length > 0) {
+                    //Use the first option's duration and price
+                    appointmentData.duration = service.options[0].duration || duration;
+                    appointmentData.price = service.options[0].price || price;
+                } else {
+//fallback to duration and price from request or empty string
+                    appointmentData.duration = duration || '';
+                    appointmentData.price = price || '';
+                }
+            } else {
+// service not found - use values from request
+                appointmentData.serviceName = serviceName || '';
+                appointmentData.duration = duration || '';
+                appointmentData.price = price || '';
+            }
+        } else {
+            //no serviceId provided - use values from request
+            appointmentData.serviceName = serviceName || '';
+            appointmentData.duration = duration || '';
+            appointmentData.price = price || '';
+        }
+
+        //ensure duration is set
+        if (!appointmentData.duration) {
+            return res.status(400).json({message: 'Duration is required'});
+        }
+
+        //add assigned staff if provided
+        if (assignedStaff) {
+            appointmentData.assignedStaff = assignedStaff;
+        }
+
+        // Crete and save the appointment
+        const newAppointment = new Appointment(appointmentData);
+        await newAppointment.save();
+
+        //populate the references before returning
+        const populatedAppointment = await Appointment.findById(newAppointment._id)
             .populate('serviceId', 'serviceName price')
-            .populate('assignedStaff', 'firstName lastName role');
+            .populate('assignedStaff', 'firstName lastName role')
+            .lean();
 
         res.status(201).json({
             success: true,
             message: 'Appointment created successfully',
             appointment: populatedAppointment
         });
-    } catch (error) {
-        console.error('Error creating appointment:', error);
-        res.status(400).json({
-            success: false,
-            message: error.message || 'Error creating appointment'
-        });
-    }
-});
 
-// Update appointment
+    } catch (err) {
+        console.error('Error creating appointment:', err);
+        res.status(500).json({message: err.message || 'Server error'} );
+    }
+    });
+
+//update appointment
 router.put('/:id', auth, async (req, res) => {
     try {
+        const userId = req.user.userId;
+        const appointmentId = req.params.id;
+
+        //check if appintment exists and belongs to user
         const appointment = await Appointment.findOne({
-            _id: req.params.id,
-            createdBy: req.userId
+            _id: appointmentId,
+            createdBy: userId
         });
 
         if (!appointment) {
-            return res.status(404).json({
-                success: false,
-                message: 'Appointment not found'
-            });
+            return res.status(404).json({ message: 'Appointment not found or you are not authorized to edit it.' });
         }
 
-        Object.assign(appointment, req.body);
-        await appointment.save();
+        //update appointment fields
+        const updateData = {...req.body};
 
-        // Populate the updated appointment
-        const populatedAppointment = await Appointment.findById(appointment._id)
+        //update the appointment
+        const updatedAppointment = await Appointment.findByIdAndUpdate(
+            appointmentId,
+            updateData,
+            { new: true }
+        )
             .populate('serviceId', 'serviceName price')
-            .populate('assignedStaff', 'firstName lastName role');
+            .populate('assignedStaff', 'firstName lastName role')
+            .lean();
 
-        res.json({
-            success: true,
+        res.status(200).json({
             message: 'Appointment updated successfully',
-            appointment: populatedAppointment
+            appointment: updatedAppointment
         });
-    } catch (error) {
-        console.error('Error updating appointment:', error);
-        res.status(400).json({
-            success: false,
-            message: error.message || 'Error updating appointment'
-        });
-    }
+    } catch (err) {
+        console.error('Error updating appointment:', err);
+        res.status(500).json({ message: 'Server error' });
+        }
 });
 
-// Delete appointment
-router.delete('/:id', auth, async (req, res) => {
+// update appointment
+router.put('/:id', auth, async (req, res) => {
     try {
-        const appointment = await Appointment.findOneAndDelete({
-            _id: req.params.id,
-            createdBy: req.userId
+        const userId = req.user.userId;
+        const appointmentId = req.params.id;
+
+        //check if appintment exists and belongs to user
+        const appointment = await Appointment.findOne({
+            _id: appointmentId,
+            createdBy: userId
         });
 
         if (!appointment) {
-            return res.status(404).json({
-                success: false,
-                message: 'Appointment not found'
-            });
+            return res.status(404).json({ message: 'Appointment not found or you are not authorized to edit it.' });
         }
 
-        res.json({
-            success: true,
-            message: 'Appointment deleted successfully'
+        //update appointment fields
+        const updateData = {...req.body};
+
+        //update the appointment
+        const updatedAppointment = await Appointment.findByIdAndUpdate(
+            appointmentId,
+            updateData,
+            {new: true}
+        )
+            .populate('serviceId', 'serviceName price')
+            .populate('assignedStaff', 'firstName lastName role')
+            .lean();
+
+        res.status(200).json({
+            message: 'Appointment updated successfully',
+            appointment: updatedAppointment
         });
-    } catch (error) {
-        console.error('Error deleting appointment:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Server error while deleting appointment'
-        });
+    } catch (err) {
+        console.error('Error updating appointment:', err);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
-// Update appointment status
+//update appointment status
 router.patch('/:id/status', auth, async (req, res) => {
-    try {
+    try{
+        const userId = req.user.userId;
+        const appointmentId = req.params.id;
         const { status } = req.body;
 
-        const appointment = await Appointment.findOne({
-            _id: req.params.id,
-            createdBy: req.userId
-        });
-
-        if (!appointment) {
-            return res.status(404).json({
-                success: false,
-                message: 'Appointment not found'
-            });
+        // validate status
+        const validStatuses = ['Scheduled', 'Confirmed', 'Completed', 'Cancelled'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({ message: 'Invalid status' });
         }
 
-        appointment.status = status;
-        await appointment.save();
+        const updatedAppointment = await Appointment.findOneAndUpdate(
+            {_id: appointmentId, createdBy: userId},
+            { status },
+            { new: true }
+        )
+            .populate('serviceId', 'serviceName price')
+            .populate('assignedStaff', 'firstName lastName role')
+            .lean();
 
-        res.json({
-            success: true,
+        if (!updatedAppointment) {
+            return res.status(404).json({ message: 'Appointment not found or you are not authorized to edit it.' });
+        }
+
+        res.status(200).json({
             message: 'Appointment status updated successfully',
-            appointment
+            appointment: updatedAppointment
         });
-    } catch (error) {
-        console.error('Error updating appointment status:', error);
-        res.status(400).json({
-            success: false,
-            message: error.message || 'Error updating appointment status'
+    } catch (err){
+        console.error('Error updating appointment status:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+//delete appointment
+router.delete('/:id', auth, async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const appointmentId = req.params.id;
+
+        const result = await Appointment.findOneAndDelete({
+            _id: appointmentId,
+            createdBy: userId
         });
+
+        if (!result) {
+            return res.status(404).json({ message: 'Appointment not found or you are not authorized to delete it.' });
+        }
+
+        res.status(200).json({ message: 'Appointment deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting appointment:', err);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 

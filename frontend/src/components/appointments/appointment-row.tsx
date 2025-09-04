@@ -18,6 +18,7 @@ interface Appointment {
     status: string
     price?: string
     assignedStaff?: {
+        _id: string
         firstName: string
         lastName: string
         role: string

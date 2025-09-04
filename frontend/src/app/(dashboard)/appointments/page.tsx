@@ -29,7 +29,7 @@ interface Appointment {
     customerPhone?: string
     customerEmail?: string
     serviceName: string
-    serviceId?: string
+    serviceId?: string | { _id: string, serviceName: string, price: string }
     duration: string
     serviceCount: string
     genderType: string
@@ -102,13 +102,20 @@ export default function AppointmentsPage() {
         try {
             console.log('Creating new appointment:', data)
 
+            // Ensure we're sending strings, not objects for IDs
+            const appointmentData = {
+                ...data,
+                serviceId: typeof data.serviceId === 'object' ? data.serviceId._id : data.serviceId,
+                assignedStaff: typeof data.assignedStaff === 'object' ? data.assignedStaff._id : data.assignedStaff
+            };
+
             const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/appointments`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${authToken}`
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(appointmentData)
             })
 
             const responseData = await res.json()
@@ -149,13 +156,20 @@ export default function AppointmentsPage() {
         try {
             console.log('Updating appointment:', selectedAppointment._id, data)
 
+            // Ensure we're sending strings, not objects for IDs
+            const appointmentData = {
+                ...data,
+                serviceId: typeof data.serviceId === 'object' ? data.serviceId._id : data.serviceId,
+                assignedStaff: typeof data.assignedStaff === 'object' ? data.assignedStaff._id : data.assignedStaff
+            };
+
             const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/appointments/${selectedAppointment._id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${authToken}`
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(appointmentData)
             })
 
             if (!res.ok) {
@@ -323,17 +337,8 @@ export default function AppointmentsPage() {
             <div className="bg-[#fcfcfc] rounded-3xl p-4 flex flex-col gap-4">
                 {/* Search and Filter */}
                 <div className="flex gap-4 items-center">
-                    <div className="relative flex-1 max-w-md">
-                        <MagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                        <Input
-                            placeholder="Search appointments..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10"
-                        />
-                    </div>
                     <Tabs value={statusFilter} onValueChange={setStatusFilter}>
-                        <TabsList>
+                        <TabsList className='font-["Inter_Tight"]'>
                             <TabsTrigger value="all">All</TabsTrigger>
                             <TabsTrigger value="Scheduled">Scheduled</TabsTrigger>
                             <TabsTrigger value="Confirmed">Confirmed</TabsTrigger>

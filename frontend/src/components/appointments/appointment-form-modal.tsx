@@ -37,8 +37,8 @@ interface AppointmentFormData {
     date: string
     customerName: string
     customerType: 'Member' | 'Non-Member'
-    customerPhone?: string
-    customerEmail?: string
+    customerPhone: string
+    customerEmail: string
     serviceName: string
     serviceId?: string
     duration: string
@@ -52,9 +52,13 @@ interface AppointmentFormData {
 interface Service {
     _id: string
     serviceName: string
-    duration: string
-    price: string
-    options?: any[]
+    duration?: string
+    price?: string
+    options?: {
+        name: string
+        duration: string
+        price: string
+    }[]
 }
 
 interface TeamMember {
@@ -66,17 +70,17 @@ interface TeamMember {
 
 interface AppointmentFormModalProps {
     onSaveAction: (data: AppointmentFormData) => void
-    appointment?: AppointmentFormData
+    appointment?: any // Allow for populated fields from backend
     open?: boolean
     setOpen?: (open: boolean) => void
 }
 
 export function AppointmentFormModal({
-    onSaveAction,
-    appointment,
-    open: controlledOpen,
-    setOpen: setControlledOpen
-}: AppointmentFormModalProps) {
+                                         onSaveAction,
+                                         appointment,
+                                         open: controlledOpen,
+                                         setOpen: setControlledOpen
+                                     }: AppointmentFormModalProps) {
     const [open, setOpen] = useState(false)
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
     const [formData, setFormData] = useState<AppointmentFormData>({
@@ -115,7 +119,28 @@ export function AppointmentFormModal({
                 })
                 if (servicesRes.ok) {
                     const servicesData = await servicesRes.json()
-                    setServices(servicesData.services || [])
+
+                    // Process services data for easier use
+                    const processedServices = servicesData.services.map((service: any) => {
+                        // Get duration and price from first option if it exists
+                        let duration = '';
+                        let price = '';
+
+                        if (service.options && service.options.length > 0) {
+                            duration = service.options[0].duration;
+                            price = service.options[0].price;
+                        }
+
+                        return {
+                            _id: service._id,
+                            serviceName: service.serviceName,
+                            duration,
+                            price,
+                            options: service.options,
+                        };
+                    });
+
+                    setServices(processedServices);
                 }
 
                 // Fetch team members
@@ -137,6 +162,21 @@ export function AppointmentFormModal({
     // Set form data when appointment prop changes
     useEffect(() => {
         if (appointment) {
+            // Handle populated fields from backend
+            let serviceIdValue = '';
+            if (appointment.serviceId) {
+                serviceIdValue = typeof appointment.serviceId === 'object' && appointment.serviceId._id
+                    ? appointment.serviceId._id
+                    : appointment.serviceId.toString();
+            }
+
+            let staffValue = '';
+            if (appointment.assignedStaff) {
+                staffValue = typeof appointment.assignedStaff === 'object' && appointment.assignedStaff._id
+                    ? appointment.assignedStaff._id
+                    : appointment.assignedStaff.toString();
+            }
+
             setFormData({
                 time: appointment.time || '',
                 date: appointment.date || '',
@@ -145,16 +185,17 @@ export function AppointmentFormModal({
                 customerPhone: appointment.customerPhone || '',
                 customerEmail: appointment.customerEmail || '',
                 serviceName: appointment.serviceName || '',
-                serviceId: appointment.serviceId || '',
+                serviceId: serviceIdValue,
                 duration: appointment.duration || '',
                 serviceCount: appointment.serviceCount || '1 service',
                 genderType: appointment.genderType || 'Unisex',
-                assignedStaff: appointment.assignedStaff || '',
+                assignedStaff: staffValue,
                 price: appointment.price || '',
                 notes: appointment.notes || ''
-            })
+            });
+
             if (appointment.date) {
-                setSelectedDate(new Date(appointment.date))
+                setSelectedDate(new Date(appointment.date));
             }
         }
     }, [appointment])
@@ -163,6 +204,7 @@ export function AppointmentFormModal({
         setFormData(prev => ({ ...prev, [field]: value }))
     }
 
+    // Update the date in the form
     const handleDateSelect = (date: Date | undefined) => {
         setSelectedDate(date)
         if (date) {
@@ -173,16 +215,35 @@ export function AppointmentFormModal({
         }
     }
 
+    // Auto-fill service details when a service is selected
     const handleServiceChange = (serviceId: string) => {
         const selectedService = services.find(s => s._id === serviceId)
         if (selectedService) {
+            // Get duration and price from selected service
+            let duration = selectedService.duration || '';
+            let price = selectedService.price || '';
+
+            // If service has options, use the first option's values
+            if (selectedService.options && selectedService.options.length > 0) {
+                duration = selectedService.options[0].duration || '';
+                price = selectedService.options[0].price || '';
+            }
+
             setFormData(prev => ({
                 ...prev,
                 serviceId,
                 serviceName: selectedService.serviceName,
-                duration: selectedService.duration,
-                price: selectedService.price
+                duration,
+                price
             }))
+
+            // Debug log to verify values
+            console.log('Service selected:', {
+                serviceId,
+                serviceName: selectedService.serviceName,
+                duration,
+                price
+            });
         }
     }
 
@@ -191,6 +252,14 @@ export function AppointmentFormModal({
         setIsLoading(true)
 
         try {
+            // Add a check to ensure duration is set
+            if (!formData.duration) {
+                throw new Error('Duration is required. Please select a service.');
+            }
+
+            // Log the form data being sent
+            console.log('Sending appointment data:', formData);
+
             await onSaveAction(formData)
 
             // Reset form
@@ -222,7 +291,7 @@ export function AppointmentFormModal({
             toast.success(appointment ? 'Appointment updated successfully!' : 'Appointment created successfully!')
         } catch (error) {
             console.error('Error saving appointment:', error)
-            toast.error('Failed to save appointment. Please try again.')
+            toast.error(error instanceof Error ? error.message : 'Failed to save appointment. Please try again.')
         } finally {
             setIsLoading(false)
         }
@@ -378,8 +447,9 @@ export function AppointmentFormModal({
                         <div className="py-1">
                             <Label htmlFor="service" className="text-black font-medium font-['Inter_Tight'] py-1 block">Service</Label>
                             <Select
-                                value={formData.serviceId}
+                                value={formData.serviceId?.toString() || ''}
                                 onValueChange={handleServiceChange}
+                                required
                             >
                                 <SelectTrigger className="text-black font-['Inter_Tight'] py-1">
                                     <SelectValue placeholder="Select a service" className="font-['Inter_Tight']" />
@@ -387,7 +457,7 @@ export function AppointmentFormModal({
                                 <SelectContent>
                                     {services.map((service) => (
                                         <SelectItem key={service._id} value={service._id} className="font-['Inter_Tight']">
-                                            {service.serviceName} - {service.duration} - {service.price}
+                                            {service.serviceName} - {service.duration || service.options?.[0]?.duration} - {service.price || service.options?.[0]?.price}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -403,7 +473,7 @@ export function AppointmentFormModal({
                                     className="text-black bg-gray-50 font-['Inter_Tight'] py-1 cursor-not-allowed"
                                     placeholder="Duration will be auto-filled"
                                     readOnly
-                                    disabled
+                                    required
                                 />
                             </div>
                             <div className="py-1">
@@ -414,7 +484,6 @@ export function AppointmentFormModal({
                                     className="text-black bg-gray-50 font-['Inter_Tight'] py-1 cursor-not-allowed"
                                     placeholder="Price will be auto-filled"
                                     readOnly
-                                    disabled
                                 />
                             </div>
                         </div>
@@ -434,7 +503,7 @@ export function AppointmentFormModal({
                             <div className="py-1">
                                 <Label htmlFor="assignedStaff" className="text-black font-medium font-['Inter_Tight'] py-1 block">Assigned Staff (Optional)</Label>
                                 <Select
-                                    value={formData.assignedStaff}
+                                    value={formData.assignedStaff?.toString() || ''}
                                     onValueChange={(value) => handleInputChange('assignedStaff', value)}
                                 >
                                     <SelectTrigger className="text-black font-['Inter_Tight'] py-1">
