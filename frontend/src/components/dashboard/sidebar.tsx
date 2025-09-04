@@ -76,17 +76,17 @@ export default function Sidebar({ onToggle }: SidebarProps) {
       key: 'dashboard',
       href: '/dashboard'
     },
+    {
+        icon: Clock,
+        label: 'Appointments',
+        key: 'appointments',
+        href: '/appointments'
+    },
     { 
       icon: Storefront, 
       label: 'Services', 
       key: 'services',
       href: '/services'
-    },
-    { 
-      icon: Clock, 
-      label: 'Appointments', 
-      key: 'appointments',
-      href: '/appointments'
     },
     { 
       icon: UsersThree, 
@@ -145,8 +145,8 @@ export default function Sidebar({ onToggle }: SidebarProps) {
           <div className="flex flex-col gap-10 w-full">
             <div className="flex flex-col gap-2 w-full">
               {/* Navigation Header */}
-              <div className="flex items-center w-full">
-                <span className="font-['Inter'] text-[12px] text-black/50 tracking-[-0.12px]">
+              <div className="flex gap-1 items-center w-full">
+                <span className="font-['Inter_Tight'] text-[12px] text-black/50 tracking-[-0.12px]">
                   Navigation Menu
                 </span>
                 <div className="flex-1 flex items-center py-1">
@@ -189,7 +189,7 @@ export default function Sidebar({ onToggle }: SidebarProps) {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex h-10 items-center justify-between w-full p-0 hover:bg-gray-50">
+              <Button variant="ghost" className="flex h-10 items-center justify-between w-full !p-0 hover:bg-gray-50">
                 <div className="flex gap-2 items-center">
                   <div className="w-10 h-10 rounded-lg border border-black/10 bg-gray-100 flex items-center justify-center overflow-hidden">
                     {user?.profilePhoto ? (
@@ -207,7 +207,7 @@ export default function Sidebar({ onToggle }: SidebarProps) {
                     )}
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-['Inter_Tight'] font-semibold text-[15px] leading-[20px] text-black/70 text-left">
+                    <span className="font-['Inter_Tight'] font-semibold text-[15px] leading-[20px] truncate w-34 text-black/70 text-left">
                       {getUserDisplayName()}
                     </span>
                   </div>

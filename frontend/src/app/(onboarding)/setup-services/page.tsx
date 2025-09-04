@@ -208,7 +208,7 @@ export default function SetupServices() {
                                 label="Price"
                                 value={opt.price}
                                 onChange={(v) => updateOption(opt.id, { price: v })}
-                                placeholder="$50"
+                                placeholder="Ru. 500"
                             />
                         </div>
 

@@ -292,8 +292,8 @@ export default function ServicesPage() {
                 <span className="font-['Inter_Tight'] font-medium text-[15px] leading-[22px]">
                   Active
                 </span>
-                                <Badge className="bg-black text-white rounded-lg px-2">
-                  <span className="font-['Inter'] font-semibold text-[12px] leading-normal tracking-[-0.048px]">
+                                <Badge className="bg-black text-white font-['Inter_Tight'] rounded-lg px-2">
+                  <span className="font-['Inter_Tight'] font-semibold text-[12px] leading-normal tracking-[-0.048px]">
                     {activeServices.length}
                   </span>
                                 </Badge>
@@ -302,8 +302,8 @@ export default function ServicesPage() {
                 <span className="font-['Inter_Tight'] font-medium text-[15px] leading-[22px]">
                   Drafts
                 </span>
-                                <Badge className="bg-black text-white rounded-lg px-2">
-                  <span className="font-['Inter'] font-semibold text-[12px] leading-normal tracking-[-0.048px]">
+                                <Badge className="bg-black text-white font-['Inter_Tight'] rounded-lg px-2">
+                  <span className="font-['Inter_Tight'] font-semibold text-[12px] leading-normal tracking-[-0.048px]">
                     {draftServices.length}
                   </span>
                                 </Badge>

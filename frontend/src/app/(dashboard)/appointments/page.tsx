@@ -316,19 +316,19 @@ export default function AppointmentsPage() {
 
                 {/* Stats Cards */}
                 <div className="flex gap-4">
-                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex-1">
+                    <div className="bg-blue-50 border border-blue-100 rounded-xl px-6 py-4 flex justify-between w-full">
                         <div className="flex items-center gap-2">
                             <CalendarBlank size={20} className="text-blue-600" />
-                            <span className="font-['Inter_Tight'] font-medium text-blue-900">Today's Appointments</span>
+                            <span className="font-['Inter_Tight'] font-medium text-blue-900">Today's Appointments:</span>
                         </div>
-                        <p className="text-2xl font-bold text-blue-900 mt-1">{todayAppointments}</p>
+                        <p className="text-2xl font-['Inter_Tight'] font-bold text-blue-900 mt-1">{todayAppointments}</p>
                     </div>
-                    <div className="bg-green-50 border border-green-100 rounded-xl p-4 flex-1">
+                    <div className="bg-green-50 border border-green-100 rounded-xl px-6 py-4 flex justify-between w-full">
                         <div className="flex items-center gap-2">
                             <Bell size={20} className="text-green-600" />
-                            <span className="font-['Inter_Tight'] font-medium text-green-900">Total Appointments</span>
+                            <span className="font-['Inter_Tight'] font-medium text-green-900">Total Appointments:</span>
                         </div>
-                        <p className="text-2xl font-bold text-green-900 mt-1">{appointments.length}</p>
+                        <p className="text-2xl font-['Inter_Tight'] font-bold text-green-900 mt-1">{appointments.length}</p>
                     </div>
                 </div>
             </div>
@@ -373,7 +373,7 @@ export default function AppointmentsPage() {
                             <div className="flex-1 max-w-40 flex items-center gap-2">
                                 <span>Date & Time</span>
                             </div>
-                            <div className="flex-1 max-w-48 flex items-center gap-2">
+                            <div className="flex-1 max-w-60 flex items-center gap-2">
                                 <span>Customer</span>
                             </div>
                             <div className="flex-1 max-w-52 flex items-center gap-2">
@@ -382,7 +382,7 @@ export default function AppointmentsPage() {
                             <div className="flex-1 max-w-44 flex items-center gap-2">
                                 <span>Staff & Status</span>
                             </div>
-                            <div className="flex-1 max-w-32 flex items-center justify-end gap-2">
+                            <div className="flex-1 w-full flex items-center justify-end gap-2">
                                 <span>Actions</span>
                             </div>
                         </div>

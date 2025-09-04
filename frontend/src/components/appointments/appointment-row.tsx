@@ -100,7 +100,7 @@ export function AppointmentRow({
             </div>
 
             {/* Customer Info Column */}
-            <div className="flex-1 max-w-48 flex flex-col gap-1">
+            <div className="flex-1 max-w-60 flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-gray-500" />
                     <span className="text-neutral-800 text-base font-medium font-['Inter_Tight']">
@@ -120,7 +120,6 @@ export function AppointmentRow({
             {/* Service Info Column */}
             <div className="flex-1 max-w-52 flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                    <Scissors className="h-4 w-4 text-gray-500" />
                     <span className="text-neutral-800 text-base font-medium font-['Inter_Tight']">
                         {appointment.serviceName}
                     </span>
@@ -145,18 +144,18 @@ export function AppointmentRow({
                         {appointment.assignedStaff.firstName} {appointment.assignedStaff.lastName}
                     </span>
                 )}
-                <Badge variant="secondary" className={`text-xs w-fit ${getStatusColor(appointment.status)}`}>
+                <Badge variant="secondary" className={`text-xs font-["Inter_Tight"] w-fit ${getStatusColor(appointment.status)}`}>
                     {appointment.status}
                 </Badge>
             </div>
 
             {/* Actions Column */}
-            <div className="flex-1 max-w-32 flex gap-2 items-center justify-end">
+            <div className="flex-1 w-full flex gap-2 items-center justify-end">
                 <Button
                     variant="outline"
                     size="sm"
                     onClick={() => onStatusChange(appointment._id, 'Cancelled')}
-                    className="text-red-600 border-red-200 hover:bg-red-50"
+                    className="text-red-600 border-red-200 hover:bg-red-50 font-['Inter_Tight']"
                 >
                     Cancel
                 </Button>
