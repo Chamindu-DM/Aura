@@ -238,6 +238,14 @@ export default function ServicesPage() {
         }
     }
 
+    // Handle service deletion
+    const handleServiceDelete = (serviceId: string) => {
+        // Remove the deleted service from local state
+        setServices(prevServices =>
+            prevServices.filter(service => service._id !== serviceId)
+        )
+    }
+
     const activeServices = services.filter(service => service.available)
     const draftServices = services.filter(service => !service.available)
 
@@ -336,6 +344,7 @@ export default function ServicesPage() {
                                 service={service}
                                 onToggleAction={handleServiceToggle}
                                 onUpdateAction={handleServiceUpdate}
+                                onDeleteAction={handleServiceDelete}
                             />
                         ))
                     )}

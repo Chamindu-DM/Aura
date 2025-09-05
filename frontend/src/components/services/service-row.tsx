@@ -20,10 +20,11 @@ export type Service = {
 export type ServiceRowProps = {
     service: Service
     onToggleAction: (id: string, checked: boolean) => void
-    onUpdateAction: (data: any, serviceId: string) => void  // Changed from onSaveAction to onUpdateAction
+    onUpdateAction: (data: any, serviceId: string) => void
+    onDeleteAction: (serviceId: string) => void
 }
 
-export default function ServiceRow({ service, onToggleAction, onUpdateAction }: ServiceRowProps) {
+export default function ServiceRow({ service, onToggleAction, onUpdateAction, onDeleteAction }: ServiceRowProps) {
     const textColorClass = service.available ? 'text-[#212121]' : 'text-gray-400';
 
     // Helper function to get display values
@@ -70,6 +71,7 @@ export default function ServiceRow({ service, onToggleAction, onUpdateAction }: 
                         </Button>
                     }
                     onSave={(data) => onUpdateAction(data, service._id)}  // Pass service ID for updates
+                    onDelete={onDeleteAction}  // Pass delete handler to modal
                     existingService={service}  // Pass existing service data
                     isEdit={true}  // Mark as edit mode
                 />

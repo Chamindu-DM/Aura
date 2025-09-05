@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { getCookie } from 'cookies-next'
+import { useRouter } from 'next/navigation'
 import {
     Dialog,
     DialogContent,
@@ -69,6 +71,7 @@ export type Service = {
 interface ServiceFormModalProps {
     trigger: React.ReactNode
     onSave?: (data: any) => void
+    onDelete?: (serviceId: string) => void  // Add onDelete callback
     existingService?: Service | null  // Add support for editing existing service
     isEdit?: boolean  // Flag to determine if this is edit mode
 }
@@ -76,6 +79,7 @@ interface ServiceFormModalProps {
 export function ServiceFormModal({
                                      trigger,
                                      onSave,
+                                     onDelete,  // Add onDelete prop
                                      existingService = null,
                                      isEdit = false
                                  }: ServiceFormModalProps) {
@@ -84,6 +88,8 @@ export function ServiceFormModal({
     const [description, setDescription] = useState('')
     const [multipleOptions, setMultipleOptions] = useState(false)
     const [options, setOptions] = useState<Option[]>([newOption()])
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)  // Add delete confirmation state
+    const router = useRouter()
 
     // Load existing service data when editing
     useEffect(() => {
@@ -142,6 +148,42 @@ export function ServiceFormModal({
         console.log('Sending data:', data)
         onSave?.(data)
         handleClose()
+    }
+
+    // Delete service function
+    const handleDelete = async () => {
+        if (!existingService?._id) {
+            toast.error('No service to delete')
+            return
+        }
+
+        const authToken = getCookie('authToken')
+        if (!authToken) {
+            toast.error("Authentication failed. Please log in again.")
+            router.push('/login')
+            return
+        }
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/services/${existingService._id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            })
+
+            if (!res.ok) {
+                const errorData = await res.json()
+                throw new Error(errorData.message || 'Failed to delete service')
+            }
+
+            toast.success('Service deleted successfully!')
+            onDelete?.(existingService._id)  // Call the callback to update parent component
+            handleClose()
+        } catch (error) {
+            console.error('Error deleting service:', error)
+            toast.error('Failed to delete service.')
+        }
     }
 
     const handleClose = () => {
@@ -245,13 +287,48 @@ export function ServiceFormModal({
                         )}
 
                         {/* Actions */}
-                        <div className="w-full max-w-[512px] py-2 flex justify-end gap-3">
-                            <Button variant="secondary" onClick={handleClose} className='font-["Inter_Tight"]'>
-                                Cancel
-                            </Button>
-                            <Button onClick={handleSave} className="bg-black text-white font-['Inter_Tight'] hover:bg-black/90">
-                                {isEdit ? 'Update' : 'Save'}
-                            </Button>
+                        <div className="w-full max-w-[512px] py-2 flex justify-between gap-3">
+                            {/* Delete button - only show in edit mode */}
+                            {isEdit && existingService && (
+                                <div>
+                                    {!showDeleteConfirm ? (
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setShowDeleteConfirm(true)}
+                                            className="border-red-200 text-red-600 hover:bg-red-50 font-['Inter_Tight']"
+                                        >
+                                            Delete Service
+                                        </Button>
+                                    ) : (
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="outline"
+                                                onClick={() => setShowDeleteConfirm(false)}
+                                                className="font-['Inter_Tight']"
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                variant="destructive"
+                                                onClick={handleDelete}
+                                                className="bg-red-600 hover:bg-red-700 font-['Inter_Tight']"
+                                            >
+                                                Confirm Delete
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Save/Cancel buttons */}
+                            <div className="flex gap-3 ml-auto">
+                                <Button variant="secondary" onClick={handleClose} className='font-["Inter_Tight"]'>
+                                    Cancel
+                                </Button>
+                                <Button onClick={handleSave} className="bg-black text-white font-['Inter_Tight'] hover:bg-black/90">
+                                    {isEdit ? 'Update' : 'Save'}
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
